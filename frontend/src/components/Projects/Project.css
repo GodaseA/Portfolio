@@ -43,7 +43,7 @@
 }
 
 .project-container img:hover {
-    transform: scale(1.10);
+    transform: scale(1.05);
     border: 4px solid #ff00ff;
     border-radius: 10px;
     transition: 0.3s;
