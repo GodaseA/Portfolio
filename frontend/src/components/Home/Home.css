@@ -5,8 +5,10 @@
     flex-direction: column;
     gap: 35px;
 }
-.pic{
-    margin-top: 150px;
+
+
+.home-left-pic{
+    margin-top: 70px;
     height: 300px;
     border-radius: 50%;
 }

@@ -1,0 +1,119 @@
+/* ─── Globe Background ──────────────────────────────────── */
+
+/*
+  Usage:
+    Place <GlobeBackground /> at the top of your root component.
+    Wrap your page content in a div with class "app-content".
+*/
+
+.globe-bg {
+  position: fixed;
+  inset: 0;                   /* shorthand for top/right/bottom/left: 0 */
+  z-index: -1;
+  overflow: hidden;
+  background: #040d1a;        /* deep-space fallback while globe loads */
+  pointer-events: none;       /* never intercept clicks */
+}
+
+/* ─── Canvas fade-in ─────────────────────────────────────── */
+
+.globe-bg__canvas {
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 1.2s ease;
+}
+
+.globe-bg__canvas--visible {
+  opacity: 1;
+}
+
+/* ─── Vignette layers ────────────────────────────────────── */
+
+.globe-bg__vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* Radial dark ring around the edges */
+.globe-bg__vignette--radial {
+  background: radial-gradient(
+    ellipse at center,
+    transparent 40%,
+    rgba(4, 13, 26, 0.75) 100%
+  );
+}
+
+/* Hard fade at the bottom — so page content doesn't float on space */
+.globe-bg__vignette--bottom {
+  background: linear-gradient(
+    to top,
+    rgba(4, 13, 26, 1)   0%,
+    rgba(4, 13, 26, 0.6) 20%,
+    transparent          50%
+  );
+}
+
+/* Softer fade at the top */
+.globe-bg__vignette--top {
+  background: linear-gradient(
+    to bottom,
+    rgba(4, 13, 26, 0.5) 0%,
+    transparent          30%
+  );
+}
+
+/* ─── App content layer ──────────────────────────────────── */
+
+/*
+  Wrap everything above the globe in .app-content.
+  This keeps z-index management in one predictable place.
+*/
+.app-content {
+  position: relative;
+  z-index: 1;
+}
+
+/* ─── Responsive sizing ──────────────────────────────────── */
+
+/*
+  The globe canvas is sized by the ResizeObserver in JS,
+  so no CSS overrides are needed for width/height.
+  These rules handle visual tuning at different breakpoints.
+*/
+
+@media (max-width: 768px) {
+  /* Stronger bottom fade on mobile — globe competes less with content */
+  .globe-bg__vignette--bottom {
+    background: linear-gradient(
+      to top,
+      rgba(4, 13, 26, 1)   0%,
+      rgba(4, 13, 26, 0.8) 35%,
+      transparent          65%
+    );
+  }
+
+  .globe-bg__vignette--radial {
+    background: radial-gradient(
+      ellipse at center,
+      transparent 20%,
+      rgba(4, 13, 26, 0.85) 100%
+    );
+  }
+}
+
+/* ─── Reduced motion ─────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .globe-bg__canvas {
+    transition: none;
+  }
+
+  /*
+    Note: react-globe.gl's autoRotate is a JS control.
+    To fully respect reduced motion, set autoRotateSpeed = 0
+    when window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    — see the useEffect in GlobeBackground.jsx.
+  */
+}

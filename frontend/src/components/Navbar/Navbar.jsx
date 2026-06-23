@@ -1,39 +1,183 @@
-import "./Navbar.css"
-import { assets } from "../../assets/assets";
-import { useRef, useState } from "react";
-import underline from "../../assets/nav_underline.svg";
-import menu_open from "../../assets/menu_open.svg";
-import menu_close from "../../assets/menu_close.svg";
-
+import { useRef, useState, useEffect } from "react";
 import AnchorLink from "react-anchor-link-smooth-scroll";
+import { FiGithub, FiLinkedin, FiFileText, FiMenu, FiX } from "react-icons/fi";
+import { assets } from "../../assets/assets";
+import "./Navbar.css";
+
+const NAV_LINKS = [
+  { id: "about",     label: "About"      },
+  { id: "project",   label: "Projects"   },
+  { id: "experince", label: "Experience" },
+];
+
+const SOCIAL_LINKS = [
+  {
+    id: "linkedin",
+    label: "LinkedIn",
+    href: "https://linkedin.com/in/your-profile",
+    icon: FiLinkedin,
+    external: true,
+  },
+  {
+    id: "github",
+    label: "GitHub",
+    href: "https://github.com/your-username",
+    icon: FiGithub,
+    external: true,
+  },
+  {
+    id: "resume",
+    label: "Download CV",
+    href: "/resume.pdf",
+    icon: FiFileText,
+    download: true,
+  },
+];
 
 const Navbar = () => {
+  const [active, setActive]       = useState("home");
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [scrolled, setScrolled]   = useState(false);
+  const drawerRef = useRef();
 
-  const [menu, setMenue] = useState("home");
-  const menuRef = useRef();
+  /* Frosted glass effect on scroll */
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
-  const openMenu = () => {
-    menuRef.current.style.right = "0";
-  }
-  const closeMenu = () => {
-    menuRef.current.style.right = "-350px";
-  }
+  /* Close drawer on ESC */
+  useEffect(() => {
+    const onKey = (e) => { if (e.key === "Escape") setMobileOpen(false); };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, []);
+
+  /* Lock body scroll when drawer open */
+  useEffect(() => {
+    document.body.style.overflow = mobileOpen ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [mobileOpen]);
+
+  const handleNav = (id) => {
+    setActive(id);
+    setMobileOpen(false);
+  };
 
   return (
-    <div className="navbar">
-      <img className="logo" src={assets.ProfilePic} alt="" />
-      <img src={menu_open} onClick={openMenu} className="nav-mob-open" alt="" />
-      <ul ref={menuRef} className="nav-menu">
-        <img src={menu_close} alt="" onClick={closeMenu} className="nav-mob-close" />
-        <li><AnchorLink className="anchor-link" href="#home"><p onClick={() => setMenue("home")}>Home</p> </AnchorLink>{menu === "home" ? <img src={underline} alt /> : <></>}</li>
-        <li><AnchorLink className="anchor-link" offset={50} href="#about"><p onClick={() => setMenue("about")}>about</p></AnchorLink>{menu === "about" ? <img src={underline} alt /> : <></>}</li>
-        <li><AnchorLink className="anchor-link" offset={50} href="#project"><p onClick={() => setMenue("project")}>Projects</p></AnchorLink>{menu === "project" ? <img src={underline} alt /> : <></>}</li>
-        <li><AnchorLink className="anchor-link" offset={50} href="#experince"><p onClick={() => setMenue("experince")}>Experience</p></AnchorLink>{menu === "experince" ? <img src={underline} alt /> : <></>}</li>
-        <li><AnchorLink className="anchor-link" offset={50} href="#contact"><p onClick={() => setMenue("contact")}>Contact</p></AnchorLink>{menu === "contact" ? <img src={underline} alt /> : <></>}</li>
-      </ul>
-      <div className="nav-connect"><AnchorLink className="anchor-link" offset={50} href="#contact">connect with me</AnchorLink></div>
+    <>
+      <nav className={`nv-root ${scrolled ? "nv-root--scrolled" : ""}`}>
 
-    </div>
+        {/* Logo / Name */}
+        <AnchorLink href="#home" className="nv-logo" onClick={() => handleNav("home")}>
+          <img src={assets.ProfilePic} alt="Abhijit Godase" className="nv-avatar" />
+          <span className="nv-brand">Abhijit<span className="nv-brand-dot">.</span></span>
+        </AnchorLink>
+
+        {/* Desktop nav links */}
+        <ul className="nv-links">
+          {NAV_LINKS.map(({ id, label }) => (
+            <li key={id} className={`nv-item ${active === id ? "nv-item--active" : ""}`}>
+              <AnchorLink
+                className="nv-anchor"
+                offset={64}
+                href={`#${id}`}
+                onClick={() => handleNav(id)}
+              >
+                {label}
+              </AnchorLink>
+            </li>
+          ))}
+        </ul>
+
+        {/* Social icons with tooltips */}
+        <div className="nv-social">
+          {SOCIAL_LINKS.map(({ id, label, href, icon: Icon, external, download }) => (
+            <a
+              key={id}
+              href={href}
+              className="nv-social-btn"
+              aria-label={label}
+              {...(external ? { target: "_blank", rel: "noreferrer" } : {})}
+              {...(download ? { download: true } : {})}
+            >
+              <Icon size={18} />
+              <span className="nv-tooltip">{label}</span>
+            </a>
+          ))}
+        </div>
+
+        {/* Mobile hamburger */}
+        <button
+          className="nv-hamburger"
+          onClick={() => setMobileOpen(true)}
+          aria-label="Open menu"
+          aria-expanded={mobileOpen}
+        >
+          <FiMenu size={22} />
+        </button>
+      </nav>
+
+      {/* Mobile overlay */}
+      <div
+        className={`nv-overlay ${mobileOpen ? "nv-overlay--visible" : ""}`}
+        onClick={() => setMobileOpen(false)}
+        aria-hidden="true"
+      />
+
+      {/* Mobile drawer */}
+      <aside
+        ref={drawerRef}
+        className={`nv-drawer ${mobileOpen ? "nv-drawer--open" : ""}`}
+        aria-label="Navigation menu"
+      >
+        <button
+          className="nv-drawer-close"
+          onClick={() => setMobileOpen(false)}
+          aria-label="Close menu"
+        >
+          <FiX size={20} />
+        </button>
+
+        <div className="nv-drawer-profile">
+          <img src={assets.ProfilePic} alt="" className="nv-drawer-avatar" />
+          <p className="nv-drawer-name">Abhijit Godase</p>
+          <p className="nv-drawer-role">Full-Stack Developer</p>
+        </div>
+
+        <ul className="nv-drawer-links">
+          {NAV_LINKS.map(({ id, label }) => (
+            <li key={id}>
+              <AnchorLink
+                className={`nv-drawer-anchor ${active === id ? "nv-drawer-anchor--active" : ""}`}
+                offset={64}
+                href={`#${id}`}
+                onClick={() => handleNav(id)}
+              >
+                {label}
+              </AnchorLink>
+            </li>
+          ))}
+        </ul>
+
+        <div className="nv-drawer-social">
+          {SOCIAL_LINKS.map(({ id, label, href, icon: Icon, external, download }) => (
+            <a
+              key={id}
+              href={href}
+              className="nv-drawer-social-btn"
+              aria-label={label}
+              {...(external ? { target: "_blank", rel: "noreferrer" } : {})}
+              {...(download ? { download: true } : {})}
+            >
+              <Icon size={15} />
+              {label}
+            </a>
+          ))}
+        </div>
+      </aside>
+    </>
   );
 };
 

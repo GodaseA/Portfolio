@@ -1,0 +1,334 @@
+/* ========== HERO SECTION ========== */
+.hero {
+  position: relative;
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  justify-items: center;
+  /* background: radial-gradient(ellipse at 70% 50%, #0d0d1a 0%, #03030a 100%); */
+  padding: 0 5%;
+  gap: 2rem;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 3;
+  text-align: left;
+  color: #ffffff;
+  max-width: 650px;
+  padding: 0 20px;
+  will-change: transform, opacity;
+  justify-self: start;
+}
+
+.hero-object {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  will-change: transform;
+  justify-self: end;
+}
+
+.canvas-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  max-width: 700px;
+  max-height: 700px;
+  will-change: transform;
+}
+
+.canvas-container canvas {
+  border-radius: 20px;
+}
+
+/* ========== TYPOGRAPHY ========== */
+.hero-title {
+  font-size: clamp(2.5rem, 5vw, 4.5rem);
+  font-weight: 800;
+  line-height: 1.1;
+  margin: 0 0 1.5rem 0;
+  letter-spacing: -0.02em;
+  position: relative;
+  z-index: 2;
+}
+
+.hero-line {
+  display: inline-block;
+  min-height: 1em;
+}
+
+.letter {
+  display: inline-block;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  opacity: 1;
+}
+
+.hero-role {
+  display: inline-block;
+  min-height: 1em;
+  background: linear-gradient(90deg, #64ccff, #8b5cf6, #c084fc);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  position: relative;
+  z-index: 2;
+}
+
+.hero-sub {
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  font-weight: 400;
+  line-height: 1.7;
+  color: #b8b8d0;
+  max-width: 550px;
+  margin: 0 0 2.5rem 0;
+  opacity: 0;
+  will-change: transform, opacity;
+  position: relative;
+  z-index: 2;
+}
+
+/* ========== BUTTONS ========== */
+.hero-actions {
+  display: flex;
+  gap: 1.25rem;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  align-items: center;
+  position: relative;
+  z-index: 2;
+}
+
+.hero-btn {
+  position: relative;
+  padding: 1rem 2.5rem;
+  background: #ffffff;
+  color: #0a0a15;
+  text-decoration: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  opacity: 0;
+  will-change: transform, opacity;
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  z-index: 2;
+}
+
+.hero-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, #64ccff, #8b5cf6);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  z-index: -1;
+}
+
+.hero-btn:hover {
+  transform: translateY(-5px);
+  color: #ffffff;
+  box-shadow: 0 20px 40px rgba(100, 204, 255, 0.35);
+}
+
+.hero-btn:hover::before {
+  opacity: 1;
+}
+
+.hero-btn.ghost {
+  background: transparent;
+  color: #ffffff;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+}
+
+.hero-btn.ghost::before {
+  background: linear-gradient(90deg, rgba(100, 204, 255, 0.15), rgba(139, 92, 246, 0.15));
+}
+
+.hero-btn.ghost:hover {
+  border-color: transparent;
+  box-shadow: 0 15px 35px rgba(139, 92, 246, 0.3);
+}
+
+/* ========== SHOWCASE SECTION (Same as before) ========== */
+.showcase {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2.5rem;
+  padding: 8rem 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  background: #080810;
+}
+
+.showcase-item {
+  padding: 3rem 2.5rem;
+  background: linear-gradient(135deg, #0f0f25 0%, #151530 100%);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  opacity: 0;
+  transform: translateY(60px);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: opacity, transform;
+}
+
+.showcase-item:hover {
+  transform: translateY(-8px);
+  border-color: rgba(100, 204, 255, 0.3);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+}
+
+.showcase-item h2 {
+  font-size: 1.85rem;
+  font-weight: 700;
+  margin: 0 0 1rem 0;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+}
+
+.showcase-item p {
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: #a0a0c0;
+  margin: 0;
+}
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 1024px) {
+  .hero {
+    grid-template-columns: 1fr;
+    text-align: center;
+    padding: 4rem 5%;
+    gap: 3rem;
+  }
+
+  .hero-content {
+    text-align: center;
+    justify-self: center;
+    max-width: 700px;
+  }
+
+  .hero-sub {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .hero-actions {
+    justify-content: center;
+  }
+
+  .hero-object {
+    justify-self: center;
+    max-width: 500px;
+    max-height: 500px;
+  }
+
+  .hero-title {
+    font-size: clamp(2rem, 7vw, 3.5rem);
+  }
+}
+
+@media (max-width: 768px) {
+  .hero {
+    height: auto;
+    min-height: 100vh;
+    padding: 3rem 1.5rem;
+  }
+
+  .hero-title {
+    font-size: clamp(1.75rem, 8vw, 2.8rem);
+  }
+
+  .hero-sub {
+    font-size: clamp(0.95rem, 2.5vw, 1.1rem);
+  }
+
+  .hero-object {
+    max-width: 350px;
+    max-height: 350px;
+  }
+
+  .showcase {
+    padding: 5rem 1.5rem;
+    gap: 2rem;
+  }
+
+  .showcase-item {
+    padding: 2rem 1.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero {
+    padding: 2rem 1rem;
+  }
+
+  .hero-actions {
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+  }
+
+  .hero-btn {
+    width: 100%;
+    text-align: center;
+    padding: 0.95rem 2rem;
+  }
+
+  .showcase {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ========== SMOOTH SCROLL & SCROLLBAR ========== */
+html {
+  scroll-behavior: smooth;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #080810;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #64ccff, #8b5cf6);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #4fb8e6, #7a67d4);
+}
+
+
+
+.canvas-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  max-width: 700px;
+  max-height: 700px;
+  will-change: transform;
+  cursor: pointer; /* Show interactive cursor */
+}
+
+.canvas-container canvas {
+  border-radius: 20px;
+  outline: none;
+}
+
+/* Add glow effect on hover */
+.canvas-container:hover canvas {
+  filter: drop-shadow(0 0 30px rgba(100, 204, 255, 0.4));
+}

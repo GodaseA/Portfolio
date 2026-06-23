@@ -1,0 +1,22 @@
+.world-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 200%;
+  height: 100vh;
+  background: url("/world-map.png") repeat-x center;
+  background-size: contain;
+  opacity: 0.1;
+  z-index: -1;
+
+  animation: moveWorld 40s linear infinite;
+}
+
+@keyframes moveWorld {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}

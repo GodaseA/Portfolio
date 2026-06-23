@@ -1,102 +1,415 @@
-.navbar {
+/* ─── Navbar ─────────────────────────────────────────────── */
+/*
+  Tokens (consistent across all sections):
+    --indigo : #6366F1
+    --amber  : #F59E0B
+    --surface: #1E2A3A
+    --muted  : #8B949E
+    --bg     : #0D1117
+    --text   : #E6EDF3
+*/
+
+/* ── Root bar ────────────────────────────────────────────── */
+.nv-root {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    height: 64px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin: 20px 170px;
+    padding: 0 40px;
+    gap: 32px;
+    font-family: 'Space Grotesk', sans-serif;
+    /* transparent by default */
+    background: transparent;
+    transition: background 0.3s ease, box-shadow 0.3s ease, backdrop-filter 0.3s ease;
+ 
 }
 
-.nav-menu {
+/* frosted glass once user scrolls */
+.nv-root--scrolled {
+    background: rgba(13, 17, 23, 0.8);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06);
+    
+}
+
+/* ── Logo / brand ────────────────────────────────────────── */
+.nv-logo {
     display: flex;
     align-items: center;
-    gap: 60px;
-    font-size: 20px;
+    gap: 10px;
+    text-decoration: none;
+    flex-shrink: 0;
+}
+
+.nv-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1.5px solid rgba(99, 102, 241, 0.5);
+    transition: border-color 0.2s;
+}
+
+.nv-logo:hover .nv-avatar {
+    border-color: #6366F1;
+}
+
+.nv-brand {
+    font-size: 17px;
+    font-weight: 700;
+    color: #F0F6FF;
+    letter-spacing: -0.3px;
+}
+
+.nv-brand-dot {
+    color: #6366F1;
+}
+
+/* ── Desktop nav links ───────────────────────────────────── */
+.nv-links {
+    display: flex;
+    align-items: center;
+    gap: 80px;
     list-style: none;
-    /* cursor: pointer; */
+    margin: 0;
+    padding: 7px 15px;
+    flex: 1;
+    justify-content: center;
+    border: 1px solid #8B949E;
+    border-radius: 20px;
+    max-width: fit-content;
+    justify-content: space-between;
+    box-shadow: 0 6px 30px #242d3b;
+    /* box-shadow: 0 0 15px 40px  #76849b; */
 }
 
-.logo {
-    height: 50px;
+.nv-item {
+    position: relative;
 }
 
-.nav-connect {
-    padding: 20px 40px;
-    border-radius: 50px;
-    background: linear-gradient(267deg, #DA7C25 0.36%, #B923E1);
-    font-size: 22px;
+.nv-anchor {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: #8B949E;
+    text-decoration: none;
+    padding: 6px 14px;
+    border-radius: 8px;
+    transition: color 0.2s, background 0.2s;
+    letter-spacing: 0.2px;
+}
+
+.nv-anchor:hover {
+    color: #E6EDF3;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* Active state: indigo underline pill */
+.nv-item--active .nv-anchor {
+    color: #F0F6FF;
+}
+
+.nv-item--active::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20px;
+    height: 2px;
+    background: #6366F1;
+    border-radius: 2px;
+}
+
+/* ── Social icon buttons with tooltips ───────────────────── */
+.nv-social {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+.nv-social-btn {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    color: #8B949E;
+    text-decoration: none;
+    transition: color 0.2s, background 0.2s;
+}
+
+.nv-social-btn:hover {
+    color: #E6EDF3;
+    background: rgba(255, 255, 255, 0.07);
+}
+
+/* Tooltip */
+.nv-tooltip {
+    position: absolute;
+    bottom: calc(-100% + 8px);
+    left: 50%;
+    transform: translateX(-50%) translateY(4px);
+    background: #1E2A3A;
+    /* background: #be143e; */
+    color: #E6EDF3;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+    padding: 5px 10px;
+    border-radius: 6px;
+    border: 1px solid rgba(99, 102, 241, 0.2);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.18s ease, transform 0.18s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+/* Arrow on tooltip */
+/* .nv-tooltip::after {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top-color: rgba(99, 102, 241, 0.2);
+} */
+
+.nv-social-btn:hover .nv-tooltip {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* ── Mobile hamburger ────────────────────────────────────── */
+.nv-hamburger {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    background: transparent;
+    color: #E6EDF3;
     cursor: pointer;
-    transition: 0.5s;
+    transition: background 0.2s, border-color 0.2s;
+    flex-shrink: 0;
 }
 
-.nav-connect:hover {
-    transform: scale(1.05);
+.nv-hamburger:hover {
+    background: rgba(255, 255, 255, 0.07);
+    border-color: rgba(99, 102, 241, 0.4);
 }
 
-.nav-menu li {
+/* ── Overlay ─────────────────────────────────────────────── */
+.nv-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1001;
+    background: rgba(4, 13, 26, 0.6);
+    backdrop-filter: blur(4px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.nv-overlay--visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* ── Slide-in drawer ─────────────────────────────────────── */
+.nv-drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1002;
+    width: 300px;
+    background: #0D1117;
+    border-left: 1px solid rgba(255, 255, 255, 0.07);
     display: flex;
     flex-direction: column;
-    gap: 5px;
-    cursor: pointer;
+    padding: 24px;
+    gap: 32px;
+    transform: translateX(100%);
+    transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: -16px 0 48px rgba(0, 0, 0, 0.5);
 }
 
-.nav-menu li img {
+.nv-drawer--open {
+    transform: translateX(0);
+}
+
+/* Close button */
+.nv-drawer-close {
+    align-self: flex-end;
     display: flex;
-    margin: auto;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 9px;
+    background: transparent;
+    color: #8B949E;
+    cursor: pointer;
+    transition: color 0.2s, background 0.2s;
 }
 
-.anchor-link {
+.nv-drawer-close:hover {
+    color: #E6EDF3;
+    background: rgba(255, 255, 255, 0.07);
+}
+
+/* Profile block */
+.nv-drawer-profile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    padding-bottom: 28px;
+}
+
+.nv-drawer-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(99, 102, 241, 0.4);
+}
+
+.nv-drawer-name {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: #F0F6FF;
+    margin: 0;
+}
+
+.nv-drawer-role {
+    font-size: 12px;
+    color: #6366F1;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    font-weight: 500;
+    margin: 0;
+}
+
+/* Drawer nav links */
+.nv-drawer-links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.nv-drawer-anchor {
+    display: block;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: #8B949E;
     text-decoration: none;
-    color: white;
+    padding: 12px 16px;
+    border-radius: 10px;
+    transition: color 0.2s, background 0.2s, padding-left 0.2s;
 }
 
-.nav-mob-close {
-    display: none;
-}
-.nav-mob-open{
-    display: none;
+.nv-drawer-anchor:hover {
+    color: #E6EDF3;
+    background: rgba(255, 255, 255, 0.05);
+    padding-left: 22px;
 }
 
-@media(max-width:768px) {
-    .navbar {
-        margin: 20px 50px;
+.nv-drawer-anchor--active {
+    color: #F0F6FF;
+    background: rgba(99, 102, 241, 0.1);
+    border-left: 2px solid #6366F1;
+    padding-left: 14px;
+}
+
+/* Drawer social buttons */
+.nv-drawer-social {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: auto;
+    padding-top: 24px;
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.nv-drawer-social-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: #8B949E;
+    text-decoration: none;
+    padding: 10px 14px;
+    border-radius: 9px;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    transition: color 0.2s, background 0.2s, border-color 0.2s;
+}
+
+.nv-drawer-social-btn:hover {
+    color: #E6EDF3;
+    background: rgba(99, 102, 241, 0.08);
+    border-color: rgba(99, 102, 241, 0.3);
+}
+
+/* ── Responsive ──────────────────────────────────────────── */
+@media (max-width: 768px) {
+    .nv-root {
+        padding: 0 20px;
     }
 
-    .nav-connect {
+    /* Hide desktop nav + social on mobile */
+    .nv-links,
+    .nv-social {
         display: none;
     }
 
-    .nav-mob-open {
-        display: block;
-        position: fixed;
-        right: 30px;
+    /* Show hamburger */
+    .nv-hamburger {
+        display: flex;
     }
+}
 
-    .nav-mob-close {
-        display: block;
-        position: relative;
-        top: 30px;
-        right: -290px;
-        width: 30px;
+@media (max-width: 480px) {
+    .nv-drawer {
+        width: 100%;
+        border-left: none;
     }
+}
 
-    .nav-menu {
-        position: fixed;
-        flex-direction: column;
-        align-items: start;
-        top: 0;
-        gap: 30px;
-        background-color: #1f0016;
-        width: 350px;
-        height: 100%;
-        z-index: 2;
-        transition: right 0.5s;
-        right: -350px;
+/* ── Reduced motion ──────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
 
+    .nv-root,
+    .nv-drawer,
+    .nv-overlay,
+    .nv-tooltip,
+    .nv-anchor,
+    .nv-social-btn,
+    .nv-drawer-anchor {
+        transition: none;
     }
-    .nav-menu li{ 
-        font-size: 30px;
-        padding-left: 100px;
-        flex-direction: row;
-        gap: 20px;
-    }
-
 }
