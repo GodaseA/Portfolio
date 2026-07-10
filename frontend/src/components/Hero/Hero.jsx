@@ -6,6 +6,8 @@ import { Environment, MeshDistortMaterial, Float, Text } from "@react-three/drei
 import * as THREE from "three";
 import AnchorLink from "react-anchor-link-smooth-scroll";
 import "./Hero.css";
+import About from "../About/About";
+import { FaRocket } from "react-icons/fa";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -395,28 +397,34 @@ export default function Hero() {
         }
       });
       gsap.set(flower.current, {
-        y: -50,
-        x: -50,
-        opacity: 0,
-        // scale:5,
-        // duration: 1,
-        // scrollTrigger: {
-        //   trigger: root.current,
-        //   start: "top top",
-        //   end: "top -40%",
-        //   scrub: 0.5
-        // }
-      });
-      gsap.to(flower.current, {
-        y: 350,
-        x: -600,
-        opacity: 0.6,
-        scale: 5,
-        duration: 1,
+        // y: -50,
+        // x: 50,
+        bottom: 100,
+        left: 600,
+        opacity: 0.1,
+        scale: 1.5,
+        duration: 10,
         scrollTrigger: {
           trigger: root.current,
           start: "top top",
           end: "top -40%",
+          scrub: 0.5
+        }
+      });
+      gsap.to(flower.current, {
+        // y: 350,
+        // x: -1200,
+        top: 100 ,
+        // left: 0,
+      
+        opacity: 0.6,
+        scale: 2,
+        duration: 10,
+        // rotation:180,
+        scrollTrigger: {
+          trigger: root.current,
+          start: "top top",
+          end: "bottom 100%",
           scrub: 0.5
         }
       });
@@ -544,22 +552,12 @@ export default function Hero() {
 
 
 
-      {/* <div
-        className="flower A"
-        onMouseEnter={rotate}
-        onMouseLeave={resetRotate}
-      > </div>
+
       <div ref={flower}
-        className="flower B"></div>
-      <div ref={flower}
-        className="flower C"></div>
-      <div ref={flower}
-        className="flower D">
-        <div className="petal"></div>
-        <div className="petal"></div>
-        <div className="petal"></div>
-        <div className="petal"></div>
-      </div> */}
+        className="flower B">
+        h<FaRocket transform="rotate(-45)" style={{fontSize:"100px"}}/>
+      </div>
+
 
       <div
         className="hero-canvas-wrap"

@@ -9,20 +9,22 @@ import Hero from "./components/Hero/Hero";
  import BackgroundWords from "./components/Background/BackgroundWords";
 import GlobeBackground from "./components/Background/Background";
 import ExperienceSection from "./components/Experience/ExperienceSection";
+import ScrollSequence from "./components/Hero/ScrollSequence";
 
 const App = () => {
   return (
     <div>
-      <GlobeBackground />
+      {/* <GlobeBackground /> */}
       <Navbar />
       {/* <Home /> */}
-      <Hero />
+      <ScrollSequence/>
+      {/* <Hero /> */}
       <About />
       <Project />
             <ExperienceSection/>
 
-      <Contact />
-      <Footer />
+      {/* <Contact /> */}
+      {/* <Footer /> */}
 
 
     </div>

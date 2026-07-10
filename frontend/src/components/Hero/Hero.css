@@ -464,10 +464,11 @@
   /* background: #f1f0ff; */
   width: 100px;
   height: 100px;
+  /* width: auto; */
   border-radius: 25%;
   z-index: 5;
   position: absolute;
-  bottom: 0px;
+  /* bottom: 0px; */
   display: flex;
   flex-wrap: wrap;
 }
@@ -476,8 +477,9 @@
   background: #b6d00b;
 }
 .B{
-  left: 30%;
-  background: #e76ea0;
+  /* top: 20%; */
+  /* right: 0; */
+  /* background: #e76ea0; */
 }
 .C{
   left: 60%;
