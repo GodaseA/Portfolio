@@ -21,7 +21,14 @@
   overflow: hidden;
   background: var(--seq-bg);
   color: var(--seq-ink);
+
+  
 }
+
+
+
+
+
 
 .sequence-canvas {
   position: absolute;

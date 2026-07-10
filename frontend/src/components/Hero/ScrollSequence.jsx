@@ -7,7 +7,8 @@ import frames from "../../assets/frames";
 gsap.registerPlugin(ScrollTrigger);
 
 const FRAME_COUNT = frames.length;
-const SCROLL_DISTANCE = 3500;
+const SCROLL_DISTANCE = 1000;
+const dr = 0.2;
 
 // Height of your fixed/sticky navbar. Bump this if the navbar height changes.
 const NAVBAR_HEIGHT = 50;
@@ -164,41 +165,41 @@ export default function ScrollSequence() {
             }
           },
         },
-      });
+      } );
 
       if (!prefersReducedMotion) {
         tl.fromTo(
           leftTextRef.current,
           { opacity: 0, x: -80, y: 20 },
-          { opacity: 1, x: 0, y: 0, duration: 0.15, ease: "power2.out" },
+          { opacity: 1, x: 0, y: 0, duration: 0.4, ease: "power2.out" },
           0
         );
 
         tl.fromTo(
           leftSubTextRef.current,
           { opacity: 0, x: -60, y: 10 },
-          { opacity: 0.85, x: 0, y: 0, duration: 0.15, ease: "power2.out" },
-          0.1
+          { opacity: 0.85, x: 0, y: 0, duration: 0.8, ease: "power2.out" },
+          0.4
         );
 
         tl.fromTo(
           rightTextRef.current,
           { opacity: 0, x: 80, y: 20 },
-          { opacity: 1, x: 0, y: 0, duration: 0.2, ease: "power2.out" },
-          0.2
+          { opacity: 1, x: 0, y: 0, duration: 1, ease: "power2.out" },
+          0.8
         );
 
         tl.fromTo(
           rightSubTextRef.current,
           { opacity: 0, x: 60, y: 10 },
-          { opacity: 0.8, x: 0, y: 0, duration: 0.15, ease: "power2.out" },
-          0.35
+          { opacity: 0.8, x: 0, y: 0, duration: 1, ease: "power2.out" },
+          1.2
         );
 
         tl.fromTo(
           ".scroll-indicator",
           { opacity: 0, y: 10 },
-          { opacity: 0.5, y: 0, duration: 0.15, ease: "power1.out" },
+          { opacity: 0.5, y: 0, duration: 1, ease: "power1.out" },
           0.7
         );
       } else {

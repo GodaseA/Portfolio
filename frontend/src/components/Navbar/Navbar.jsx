@@ -42,7 +42,7 @@ const Navbar = () => {
 
   /* Frosted glass effect on scroll */
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 3000);
+    const onScroll = () => setScrolled(window.scrollY > 1500);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
