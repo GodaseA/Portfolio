@@ -14,18 +14,12 @@ import ScrollSequence from "./components/Hero/ScrollSequence";
 const App = () => {
   return (
     <div>
-      {/* <GlobeBackground /> */}
-      <Navbar />
-      {/* <Home /> */}
-      <ScrollSequence/>
-      {/* <Hero /> */}
-      <About />
+       <Navbar />
+       <ScrollSequence/>
+       <About />
       <Project />
             <ExperienceSection/>
-
-      {/* <Contact /> */}
-      {/* <Footer /> */}
-
+ 
 
     </div>
   )

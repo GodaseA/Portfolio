@@ -140,10 +140,11 @@ export default function ScrollSequence() {
         scrollTrigger: {
           trigger: sectionRef.current,
           start: "top top",
-          end: `+=${SCROLL_DISTANCE}`,
+          end: `+=${SCROLL_DISTANCE}`, //1000
           pin: true,
           scrub: 1,
           pinSpacing: true,
+           refreshPriority: 1,
           onUpdate: (self) => {
             const index = Math.min(
               FRAME_COUNT - 1,
@@ -220,7 +221,7 @@ export default function ScrollSequence() {
         );
       }
     }, sectionRef);
-
+requestAnimationFrame(() => ScrollTrigger.refresh());
     return () => ctx.revert();
   }, [isReady, draw]);
 

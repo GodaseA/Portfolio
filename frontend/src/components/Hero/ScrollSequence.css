@@ -15,14 +15,19 @@
      in ScrollSequence.jsx so the canvas image and text line up. */
   --seq-nav-offset: 80px;
 
-  position: relative;
+  /* position: relative; */
   width: 100%;
   height: 100vh;
   overflow: hidden;
   background: var(--seq-bg);
   color: var(--seq-ink);
 
-  
+
+  /* height:100vh; */
+  position: sticky;
+  top: 0;
+  z-index: 1;
+
 }
 
 
@@ -289,12 +294,19 @@
 }
 
 @keyframes bounce {
-  0%, 20%, 50%, 80%, 100% {
+
+  0%,
+  20%,
+  50%,
+  80%,
+  100% {
     transform: translateY(0);
   }
+
   40% {
     transform: translateY(-10px);
   }
+
   60% {
     transform: translateY(-5px);
   }
@@ -322,6 +334,7 @@
   .text-block {
     transition: none;
   }
+
   .scroll-indicator {
     animation: none;
   }

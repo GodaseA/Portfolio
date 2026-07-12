@@ -1,7 +1,12 @@
-import { useState, useCallback } from "react";
+// Project.jsx
+import React, { useLayoutEffect, useRef, useState } from "react";
 import { FiGithub, FiExternalLink, FiArrowUpRight } from "react-icons/fi";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import img from "../../assets/demo.jpg";
 import "./Project.css";
+
+gsap.registerPlugin(ScrollTrigger);
 
 /* ─── Data ───────────────────────────────────────────────── */
 const PROJECTS = [
@@ -9,193 +14,286 @@ const PROJECTS = [
     id: 1,
     name: "Food Delivery App",
     tag: "Full-Stack",
-    des: "End-to-end food ordering platform with real-time tracking, cart management, and Stripe payments.",
-    img: img,
-    icon: img,
+    description:
+      "End-to-end food ordering platform with real-time tracking, cart management, and Stripe payments.",
+    image: img,
     github: "#",
     live: "#",
+    technologies: ["React", "Node.js", "MongoDB", "Stripe"],
   },
   {
     id: 2,
     name: "Portfolio Website",
     tag: "Frontend",
-    des: "Animated personal portfolio with custom cursor effects, 3D globe, and smooth scroll transitions.",
-    img: img,
-    icon: img,
+    description:
+      "Animated personal portfolio with custom cursor effects, 3D globe, and smooth scroll transitions.",
+    image: img,
     github: "#",
     live: "#",
+    technologies: ["React", "GSAP", "Three.js"],
   },
   {
     id: 3,
     name: "Chat Application",
     tag: "Full-Stack",
-    des: "Real-time messaging app powered by Socket.io with room-based channels and media sharing.",
-    img: img,
-    icon: img,
+    description:
+      "Real-time messaging app powered by Socket.io with room-based channels and media sharing.",
+    image: img,
     github: "#",
     live: "#",
+    technologies: ["React", "Socket.io", "Express", "MongoDB"],
   },
   {
     id: 4,
     name: "E-Commerce Store",
     tag: "Full-Stack",
-    des: "Product catalogue with search, filters, wishlist, and an admin dashboard for inventory management.",
-    img: img,
-    icon: img,
+    description:
+      "Product catalogue with search, filters, wishlist, and an admin dashboard for inventory management.",
+    image: img,
     github: "#",
     live: "#",
+    technologies: ["React", "Redux", "Node.js", "PostgreSQL"],
   },
   {
     id: 5,
     name: "Task Manager",
     tag: "Frontend",
-    des: "Drag-and-drop Kanban board with local persistence, labels, and deadline reminders.",
-    img: img,
-    icon: img,
+    description:
+      "Drag-and-drop Kanban board with local persistence, labels, and deadline reminders.",
+    image: img,
     github: "#",
     live: "#",
+    technologies: ["React", "DnD Kit", "LocalStorage"],
   },
   {
     id: 6,
     name: "Weather Dashboard",
     tag: "API",
-    des: "7-day forecast dashboard using OpenWeatherMap API with animated weather icons and geolocation.",
-    img: img,
-    icon: img,
+    description:
+      "7-day forecast dashboard using OpenWeatherMap API with animated weather icons and geolocation.",
+    image: img,
     github: "#",
     live: "#",
+    technologies: ["React", "Axios", "Chart.js"],
   },
 ];
 
 /* ─── Component ──────────────────────────────────────────── */
 export default function Project() {
-  const [active, setActive]     = useState(PROJECTS[0]); // drives the static right-side panel
-  const [expanded, setExpanded] = useState(null);         // mobile tap state
 
-  const handleFocus = useCallback((project) => {
-    setActive(project);
+    const [hovered, setHovered] = useState(false);
+  const sectionRef = useRef(null);
+  const gridRef = useRef(null);
+  const cardRefs = useRef([]);
+  const counterRef = useRef(null);
+  const railFillRef = useRef(null);
+
+  useLayoutEffect(() => {
+    const section = sectionRef.current;
+    const grid = gridRef.current;
+    const cards = cardRefs.current.filter(Boolean);
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+
+    const ctx = gsap.context(() => {
+      const mm = gsap.matchMedia();
+
+      /* Desktop / tablet landscape → pinned horizontal scroll */
+      mm.add("(min-width: 900px)", () => {
+        const getDistance = () => grid.scrollWidth - section.offsetWidth;
+
+        const tween = gsap.to(grid, {
+          x: () => -getDistance(),
+          ease: "none",
+          scrollTrigger: {
+            id: "project-horizontal",
+            trigger: section,
+            start: "top top",
+            end: () => `+=${getDistance()}`,
+            pin: true,
+            pinSpacing: true,
+            anticipatePin: 1,
+            scrub: 0.6,
+            invalidateOnRefresh: true,
+            onUpdate: (self) => {
+              const index = Math.min(
+                PROJECTS.length - 1,
+                Math.floor(self.progress * PROJECTS.length)
+              );
+              if (counterRef.current) {
+                counterRef.current.textContent = String(index + 1).padStart(
+                  2,
+                  "0"
+                );
+              }
+              if (railFillRef.current) {
+                railFillRef.current.style.transform = `scaleX(${self.progress})`;
+              }
+            },
+          },
+        });
+
+        if (!prefersReducedMotion) {
+          gsap.from(cards, {
+            opacity: 0,
+            y: 40,
+            duration: 0.6,
+            stagger: 0.08,
+            ease: "power3.out",
+            scrollTrigger: { trigger: section, start: "top 75%" },
+          });
+        }
+
+        return () => {
+          tween.scrollTrigger && tween.scrollTrigger.kill();
+          tween.kill();
+        };
+      });
+
+      /* Tablet portrait / mobile → normal vertical stack + reveal */
+      mm.add("(max-width: 899px)", () => {
+        if (!prefersReducedMotion) {
+          cards.forEach((card) => {
+            gsap.from(card, {
+              opacity: 0,
+              y: 50,
+              duration: 0.7,
+              ease: "power3.out",
+              scrollTrigger: { trigger: card, start: "top 88%" },
+            });
+          });
+        }
+      });
+
+      if (!prefersReducedMotion) {
+        gsap.from(".project-eyebrow, .project-title", {
+          opacity: 0,
+          y: 20,
+          duration: 0.8,
+          ease: "power3.out",
+          scrollTrigger: { trigger: section, start: "top 85%" },
+        });
+      }
+    }, sectionRef);
+
+    /* Re-measure once webfonts + images have actually settled.
+       Multiple ScrollTrigger instances on one page (this section
+       plus whatever runs earlier on the site) all share the same
+       document height, so a late layout shift anywhere — most
+       often async webfont loading — leaves every pin-spacer's
+       reserved height stale, which is what causes sections to
+       overlap. A single global refresh fixes all of them at once. */
+    const refresh = () => ScrollTrigger.refresh();
+
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(refresh);
+    }
+    window.addEventListener("load", refresh);
+
+    const images = section.querySelectorAll("img");
+    images.forEach((image) => {
+      if (!image.complete) image.addEventListener("load", refresh);
+    });
+
+    return () => {
+      ctx.revert();
+      window.removeEventListener("load", refresh);
+      images.forEach((image) => image.removeEventListener("load", refresh));
+
+
+
+     
+    };
   }, []);
 
-  /* Mobile: toggle expanded card */
-  const handleTap = (project) => {
-    setExpanded((prev) => (prev?.id === project.id ? null : project));
-  };
-
   return (
-    <section id="project" className="pj-root">
+    <section className="project-section" ref={sectionRef}>
+      <div className="project-wrapper">
+        <header className="project-header">
+          <div className="project-heading">
+            <span className="project-eyebrow">Project Index — 2026</span>
+            <h2 className="project-title">Selected Work</h2>
+          </div>
 
-      {/* Header */}
-      <div className="pj-header">
-        <p className="pj-eyebrow">Selected work</p>
-        <h2 className="pj-headline">
-          My Latest <span>Work.</span>
-        </h2>
-      </div>
+          <div className="project-rail" aria-hidden="true">
+            <span className="project-counter">
+              <span ref={counterRef}>01</span>
+              <span className="project-counter-total">
+                {" "}
+                / {String(PROJECTS.length).padStart(2, "0")}
+              </span>
+            </span>
+            <div className="project-rail-track">
+              <div className="project-rail-fill" ref={railFillRef} />
+            </div>
+          </div>
+        </header>
 
-      <div className="pj-layout">
-
-        {/* Project list — left column */}
-        <ul className="pj-list" role="list">
+        <div className="project-grid" ref={gridRef}>
           {PROJECTS.map((project, i) => (
-            <li key={project.id} className="pj-item">
+            <article
+              key={project.id}
+              className={ hovered ? "project-card active" :"project-card"}
+              ref={(el) => (cardRefs.current[i] = el)}
 
-              {/* Row */}
-              <div
-                className={`pj-row ${active?.id === project.id ? "pj-row--active" : ""}`}
-                onMouseEnter={() => handleFocus(project)}
-                onFocus={() => handleFocus(project)}
-                onClick={() => handleTap(project)}
-                role="button"
-                tabIndex={0}
-                aria-label={`View ${project.name}`}
-                aria-pressed={active?.id === project.id}
-                onKeyDown={(e) => e.key === "Enter" && handleTap(project)}
+
+
+
+              onMouseEnter={() => setHovered(true)}
+              onMouseLeave={() => setHovered(false)}
+            >
+              <span className="project-card-index">
+                {String(project.id).padStart(2, "0")}
+              </span>
+
+              <a
+                href={project.live}
+                target="_blank"
+                rel="noreferrer"
+                className="project-card-media"
+                aria-label={`View ${project.name} live`}
               >
-                <span className="pj-index">0{i + 1}</span>
-
-                <div className="pj-icon-wrap">
-                  <img src={project.icon} alt="" className="pj-icon" />
-                </div>
-
-                <span className="pj-name">{project.name}</span>
-
-                <span className="pj-tag">{project.tag}</span>
-
-                <span className="pj-row-arrow" aria-hidden="true">
-                  <FiArrowUpRight size={16} />
+                <img src={project.image} alt={project.name} loading="lazy" />
+                <span className="project-card-tag">{project.tag}</span>
+                <span className="project-card-view">
+                  <FiArrowUpRight />
                 </span>
-              </div>
+              </a>
 
-              {/* Mobile expanded panel (tap-to-open, replaces the desktop side panel) */}
-              <div className={`pj-expand ${expanded?.id === project.id ? "pj-expand--open" : ""}`}>
-                <img src={project.img} alt={project.name} className="pj-expand-img" />
-                <p className="pj-expand-des">{project.des}</p>
-                <div className="pj-expand-links">
+              <div className="project-card-body">
+                <h3 className="project-card-name">{project.name}</h3>
+                <p className="project-card-desc">{project.description}</p>
+
+                <ul className="project-card-stack">
+                  {project.technologies.map((tech) => (
+                    <li key={tech}>{tech}</li>
+                  ))}
+                </ul>
+
+                <div className="project-card-links">
                   <a
                     href={project.github}
-                    className="pj-icon-link"
-                    aria-label={`${project.name} GitHub repository`}
-                    onClick={(e) => e.stopPropagation()}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="project-link"
                   >
-                    <FiGithub size={16} />
-                    <span>Code</span>
+                    <FiGithub /> Code
                   </a>
                   <a
                     href={project.live}
-                    className="pj-icon-link pj-icon-link--primary"
-                    aria-label={`${project.name} live site`}
-                    onClick={(e) => e.stopPropagation()}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="project-link project-link-primary"
                   >
-                    <FiExternalLink size={16} />
-                    <span>Live site</span>
+                    <FiExternalLink /> Live
                   </a>
                 </div>
               </div>
-
-            </li>
+            </article>
           ))}
-        </ul>
-
-        {/* Static detail dive — right column, swaps content on hover/focus */}
-        <div className="pj-detail">
-          <div className="pj-detail-card" key={active.id}>
-            <div className="pj-detail-img-wrap">
-              <img src={active.img} alt={active.name} className="pj-detail-img" />
-            </div>
-
-            <div className="pj-detail-body">
-              <p className="pj-detail-tag">{active.tag}</p>
-              <h3 className="pj-detail-name">{active.name}</h3>
-              <p className="pj-detail-des">{active.des}</p>
-
-              <div className="pj-detail-links">
-                <a
-                  href={active.github}
-                  className="pj-detail-link"
-                  target="_blank"
-                  rel="noreferrer"
-                  aria-label={`${active.name} GitHub repository`}
-                >
-                  <FiGithub size={18} />
-                  <span>GitHub</span>
-                </a>
-                <a
-                  href={active.live}
-                  className="pj-detail-link pj-detail-link--primary"
-                  target="_blank"
-                  rel="noreferrer"
-                  aria-label={`${active.name} live site`}
-                >
-                  <FiExternalLink size={18} />
-                  <span>Live site</span>
-                </a>
-              </div>
-            </div>
-          </div>
         </div>
-
       </div>
-
     </section>
   );
 }
