@@ -1,9 +1,15 @@
 // Project.jsx
-import React, { useLayoutEffect, useRef, useState } from "react";
+import React, { useLayoutEffect, useRef } from "react";
 import { FiGithub, FiExternalLink, FiArrowUpRight } from "react-icons/fi";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import img from "../../assets/demo.jpg";
+import portfolio from "../../assets/projects/portpolio.png"
+import eComerce from "../../assets/projects/e-comerce.png"
+import foodDel from "../../assets/projects/foodDel.png"
+import lms from "../../assets/projects/lms.png"
+import aqi from "../../assets/projects/aqi.png"
+
 import "./Project.css";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -14,9 +20,8 @@ const PROJECTS = [
     id: 1,
     name: "Food Delivery App",
     tag: "Full-Stack",
-    description:
-      "End-to-end food ordering platform with real-time tracking, cart management, and Stripe payments.",
-    image: img,
+    description: "End-to-end food ordering platform.",
+    image: foodDel,
     github: "#",
     live: "#",
     technologies: ["React", "Node.js", "MongoDB", "Stripe"],
@@ -25,20 +30,18 @@ const PROJECTS = [
     id: 2,
     name: "Portfolio Website",
     tag: "Frontend",
-    description:
-      "Animated personal portfolio with custom cursor effects, 3D globe, and smooth scroll transitions.",
-    image: img,
+    description: "Animated personal portfolio",
+    image: portfolio,
     github: "#",
     live: "#",
     technologies: ["React", "GSAP", "Three.js"],
   },
   {
     id: 3,
-    name: "Chat Application",
+    name: "AQI Predictor",
     tag: "Full-Stack",
-    description:
-      "Real-time messaging app powered by Socket.io with room-based channels and media sharing.",
-    image: img,
+    description: "Real-time AQI Predictor.",
+    image: aqi,
     github: "#",
     live: "#",
     technologies: ["React", "Socket.io", "Express", "MongoDB"],
@@ -47,20 +50,18 @@ const PROJECTS = [
     id: 4,
     name: "E-Commerce Store",
     tag: "Full-Stack",
-    description:
-      "Product catalogue with search, filters, wishlist, and an admin dashboard for inventory management.",
-    image: img,
+    description: "Product and inventory management.",
+    image: eComerce,
     github: "#",
     live: "#",
     technologies: ["React", "Redux", "Node.js", "PostgreSQL"],
   },
   {
     id: 5,
-    name: "Task Manager",
+    name: "Learning Management System",
     tag: "Frontend",
-    description:
-      "Drag-and-drop Kanban board with local persistence, labels, and deadline reminders.",
-    image: img,
+    description: "Get and Create corces.",
+    image: lms,
     github: "#",
     live: "#",
     technologies: ["React", "DnD Kit", "LocalStorage"],
@@ -69,8 +70,7 @@ const PROJECTS = [
     id: 6,
     name: "Weather Dashboard",
     tag: "API",
-    description:
-      "7-day forecast dashboard using OpenWeatherMap API with animated weather icons and geolocation.",
+    description: "7-day forecast dashboard .",
     image: img,
     github: "#",
     live: "#",
@@ -80,8 +80,6 @@ const PROJECTS = [
 
 /* ─── Component ──────────────────────────────────────────── */
 export default function Project() {
-
-    const [hovered, setHovered] = useState(false);
   const sectionRef = useRef(null);
   const gridRef = useRef(null);
   const cardRefs = useRef([]);
@@ -99,38 +97,66 @@ export default function Project() {
     const ctx = gsap.context(() => {
       const mm = gsap.matchMedia();
 
-      /* Desktop / tablet landscape → pinned horizontal scroll */
+      /* Desktop / tablet landscape → pinned horizontal scroll,
+         driven per-card instead of on the grid container */
       mm.add("(min-width: 900px)", () => {
-        const getDistance = () => grid.scrollWidth - section.offsetWidth;
+        // Cache each card's natural (untransformed) position/size.
+        // offsetLeft/offsetWidth reflect layout, not GSAP's transform,
+        // so this stays valid while the card is being translated/scaled.
+        let naturalLefts = [];
+        let cardWidths = [];
 
-        const tween = gsap.to(grid, {
-          x: () => -getDistance(),
-          ease: "none",
-          scrollTrigger: {
-            id: "project-horizontal",
-            trigger: section,
-            start: "top top",
-            end: () => `+=${getDistance()}`,
-            pin: true,
-            pinSpacing: true,
-            anticipatePin: 1,
-            scrub: 0.6,
-            invalidateOnRefresh: true,
-            onUpdate: (self) => {
-              const index = Math.min(
-                PROJECTS.length - 1,
-                Math.floor(self.progress * PROJECTS.length)
+        const measure = () => {
+          naturalLefts = cards.map((c) => c.offsetLeft);
+          cardWidths = cards.map((c) => c.offsetWidth);
+        };
+        measure();
+
+        const getDistance = () => grid.scrollWidth - section.offsetWidth + 1200;
+
+        const st = ScrollTrigger.create({
+          id: "project-horizontal",
+          trigger: section,
+          start: "top top",
+          end: () => `+=${getDistance()}`,
+          pin: true,
+          pinSpacing: true,
+          anticipatePin: 1,
+          scrub: 0.6,
+          invalidateOnRefresh: true,
+          onRefresh: measure,
+          onUpdate: (self) => {
+            const progress = self.progress;
+            const shift = -progress * getDistance();
+            const viewportCenter = section.offsetWidth / 2;
+
+            cards.forEach((card, i) => {
+              const cardWidth = cardWidths[i] || card.offsetWidth;
+              const cardCenter = naturalLefts[i] + cardWidth / 2 + shift;
+              const away = Math.abs(cardCenter - viewportCenter);
+              const maxAway = viewportCenter + cardWidth / 2;
+              const norm = gsap.utils.clamp(0, 1, away / maxAway);
+              // Peaks at 1.05 when centered, eases down to 0.85 at the edges
+              // const scale = gsap.utils.mapRange(0, 1, 1.05, 0.85)(norm);
+                            const scale = gsap.utils.mapRange(0, 1, 0.9, 0.6)(norm);
+
+
+              gsap.set(card, { x: shift, scale, force3D: true });
+            });
+
+            const index = Math.min(
+              PROJECTS.length - 1,
+              Math.floor(progress * PROJECTS.length)
+            );
+            if (counterRef.current) {
+              counterRef.current.textContent = String(index + 1).padStart(
+                2,
+                "0"
               );
-              if (counterRef.current) {
-                counterRef.current.textContent = String(index + 1).padStart(
-                  2,
-                  "0"
-                );
-              }
-              if (railFillRef.current) {
-                railFillRef.current.style.transform = `scaleX(${self.progress})`;
-              }
-            },
+            }
+            if (railFillRef.current) {
+              railFillRef.current.style.transform = `scaleX(${progress})`;
+            }
           },
         });
 
@@ -146,8 +172,8 @@ export default function Project() {
         }
 
         return () => {
-          tween.scrollTrigger && tween.scrollTrigger.kill();
-          tween.kill();
+          st.kill();
+          cards.forEach((c) => gsap.set(c, { clearProps: "transform" }));
         };
       });
 
@@ -200,10 +226,6 @@ export default function Project() {
       ctx.revert();
       window.removeEventListener("load", refresh);
       images.forEach((image) => image.removeEventListener("load", refresh));
-
-
-
-     
     };
   }, []);
 
@@ -232,65 +254,61 @@ export default function Project() {
 
         <div className="project-grid" ref={gridRef}>
           {PROJECTS.map((project, i) => (
-            <article
+            <div
               key={project.id}
-              className={ hovered ? "project-card active" :"project-card"}
+              className="project-card-track"
               ref={(el) => (cardRefs.current[i] = el)}
-
-
-
-
-              onMouseEnter={() => setHovered(true)}
-              onMouseLeave={() => setHovered(false)}
             >
-              <span className="project-card-index">
-                {String(project.id).padStart(2, "0")}
-              </span>
-
-              <a
-                href={project.live}
-                target="_blank"
-                rel="noreferrer"
-                className="project-card-media"
-                aria-label={`View ${project.name} live`}
-              >
-                <img src={project.image} alt={project.name} loading="lazy" />
-                <span className="project-card-tag">{project.tag}</span>
-                <span className="project-card-view">
-                  <FiArrowUpRight />
+              <article className="project-card">
+                <span className="project-card-index">
+                  {String(project.id).padStart(2, "0")}
                 </span>
-              </a>
 
-              <div className="project-card-body">
-                <h3 className="project-card-name">{project.name}</h3>
-                <p className="project-card-desc">{project.description}</p>
+                <a
+                  href={project.live}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="project-card-media"
+                  aria-label={`View ${project.name} live`}
+                >
+                  <img src={project.image} alt={project.name} loading="lazy" />
+                  <h3 className="project-card-tag">{project.tag}</h3>
+                  <span className="project-card-view">
+                    <FiArrowUpRight />
+                  </span>
+                </a>
 
-                <ul className="project-card-stack">
-                  {project.technologies.map((tech) => (
-                    <li key={tech}>{tech}</li>
-                  ))}
-                </ul>
+                <div className="project-card-body">
+                  <h1 className="project-card-name"> {project.name}</h1>
+                  <p className="project-card-desc">{project.description}</p>
 
-                <div className="project-card-links">
-                  <a
-                    href={project.github}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="project-link"
-                  >
-                    <FiGithub /> Code
-                  </a>
-                  <a
-                    href={project.live}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="project-link project-link-primary"
-                  >
-                    <FiExternalLink /> Live
-                  </a>
+                  <ul className="project-card-stack">
+                    {project.technologies.map((tech) => (
+                      <li key={tech}>{tech}</li>
+                    ))}
+                  </ul>
+
+                  <div className="project-card-links">
+                    <a
+                      href={project.github}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="project-link"
+                    >
+                      <FiGithub /> Code
+                    </a>
+                    <a
+                      href={project.live}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="project-link project-link-primary"
+                    >
+                      <FiExternalLink /> Live
+                    </a>
+                  </div>
                 </div>
-              </div>
-            </article>
+              </article>
+            </div>
           ))}
         </div>
       </div>

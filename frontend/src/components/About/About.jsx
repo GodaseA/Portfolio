@@ -1,31 +1,57 @@
-import { useState, useEffect, useRef } from "react";
-import { assets } from "../../assets/assets";
+import { useEffect, useRef } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import "./About.css";
-import { label } from "three/tsl";
-import { FaReact, FaNodeJs, FaHtml5, FaCss3Alt, FaJs } from "react-icons/fa";
-import { SiMongodb, SiExpress } from "react-icons/si";
 
-const WORDS = ["React", "Node.js", "HTML", "CSS", "JavaScript", "MongoDB"];
-const imgWords = ["A full-stack Developer", "I am Abhijit Godase", "A full-stack Developer"];
+gsap.registerPlugin(ScrollTrigger);
+
+/* ── Data ──────────────────────────────────────────────── */
+const BG_WORDS = ["React", "Node.js", "HTML", "CSS", "JavaScript", "MongoDB"];
 const ROWS = 24;
 const COLS = 24;
-// const ProfilePic = assets.ProfilePic
-import ProfilePic from "../../assets/mydemoo.png"
+
 const SKILLS = [
-  { icon: FaReact, label: "React" },
-  { icon: FaNodeJs, label: "Node.js" },
-  { icon: SiExpress, label: "Express" },
-  { icon: SiMongodb, label: "MongoDB" },
-  { icon: FaJs, label: "JavaScript" },
-  { icon: FaHtml5, label: "HTML" },
-  { icon: FaCss3Alt, label: "CSS" },
+  "typescript",
+  "javascript",
+  "java",
+  "react",
+  "nodejs",
+  "express",
+  "tailwindcss",
+  "gsap",
+  "redux",
+  "mysql",
+  "mongodb",
+  "redis",
+  "postman",
+  "GitHub",
+  "Vercel",
 ];
 
+// value + suffix are split so the number can be counted up independently
 const STATS = [
-  { num: "1+", label: ["Years of", "Experience"] },
-  { num: "10+", label: ["Projects", "Completed"] },
-  { num: "50+", label: ["LeetCode", "Solved"] },
+  { value: 1, suffix: "+", label: ["Years of", "Experience"] },
+  { value: 10, suffix: "+", label: ["Projects", "Completed"] },
+  { value: 50, suffix: "+", label: ["LeetCode", "Solved"] },
 ];
+
+const BIO = [
+  <>
+    I&apos;m a <strong>full-stack developer</strong> who loves building
+    interactive web apps that solve real-world problems — from concept to
+    shipped product.
+  </>,
+  <>
+    Currently sharpening my skills across the <strong>MERN stack</strong>,
+    with a focus on performance, clean APIs, and interfaces that feel alive.
+  </>,
+];
+
+// Eagerly resolves every svg in /assets/techstack so it can be looked up by name
+const techIcons = import.meta.glob("../../assets/techstack/*.svg", {
+  eager: true,
+  import: "default",
+});
 
 const About = () => {
   const rootRef = useRef(null);
@@ -33,15 +59,9 @@ const About = () => {
   const spotRef = useRef(null);
   const cursorRef = useRef(null);
   const ringRef = useRef(null);
-  const [barsReady, setBarsReady] = useState(false);
+  const statNumRefs = useRef([]);
 
-  /* Animate skill bars after mount */
-  useEffect(() => {
-    const t = setTimeout(() => setBarsReady(true), 400);
-    return () => clearTimeout(t);
-  }, []);
-
-  /* Custom cursor + spotlight + proximity word highlight */
+  /* Ambient cursor + spotlight + proximity word highlight (desktop only) */
   useEffect(() => {
     const root = rootRef.current;
     const bg = bgRef.current;
@@ -49,6 +69,9 @@ const About = () => {
     const cursor = cursorRef.current;
     const ring = ringRef.current;
     if (!root) return;
+
+    const mq = window.matchMedia("(hover: hover) and (pointer: fine)");
+    if (!mq.matches) return;
 
     const onMove = (e) => {
       const rect = root.getBoundingClientRect();
@@ -68,10 +91,10 @@ const About = () => {
           const sr = sp.getBoundingClientRect();
           const cx = sr.left + sr.width / 2 - rect.left;
           const cy = sr.top + sr.height / 2 - rect.top;
-          const dist = Math.sqrt((cx - x) ** 2 + (cy - y) ** 2);
+          const dist = Math.hypot(cx - x, cy - y);
           if (dist < 180) {
             const t = 1 - dist / 180;
-            sp.style.color = `rgba(99,102,241,${0.08 + t * 0.55})`;
+            sp.style.color = `rgba(224, 51, 63, ${0.08 + t * 0.55})`;
             sp.style.transform = `scale(${1 + t * 0.15})`;
           } else {
             sp.style.color = "";
@@ -85,142 +108,156 @@ const About = () => {
     return () => document.removeEventListener("mousemove", onMove);
   }, []);
 
+  /* Scroll-driven reveal choreography */
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: rootRef.current,
+          start: "top 75%",
+          toggleActions: "play none none reverse",
+        },
+      });
+
+      tl.from(".ab-eyebrow", { opacity: 0, x: -24, duration: 0.5, ease: "power2.out" })
+        .from(
+          ".ab-word",
+          { opacity: 0, y: 40, duration: 0.7, stagger: 0.12, ease: "power3.out" },
+          "-=0.2"
+        )
+        .from(
+          ".ab-bio p",
+          { opacity: 0, y: 16, duration: 0.5, stagger: 0.15, ease: "power2.out" },
+          "-=0.3"
+        );
+
+      // Stat cards reveal
+      gsap.from(".ab-stat", {
+        opacity: 0,
+        y: 24,
+        duration: 0.6,
+        stagger: 0.12,
+        ease: "power2.out",
+        scrollTrigger: {
+          trigger: ".ab-stats",
+          start: "top 85%",
+          toggleActions: "play none none reverse",
+        },
+      });
+
+      // Stat number count-up, synced with the reveal above
+      statNumRefs.current.forEach((el, i) => {
+        if (!el) return;
+        const { value, suffix } = STATS[i];
+        const counter = { val: 0 };
+        gsap.to(counter, {
+          val: value,
+          duration: 1.2,
+          ease: "power1.out",
+          scrollTrigger: {
+            trigger: ".ab-stats",
+            start: "top 85%",
+            toggleActions: "play none none reverse",
+          },
+          onUpdate: () => {
+            el.textContent = `${Math.round(counter.val)}${suffix}`;
+          },
+        });
+      });
+
+
+       gsap.set(".ab-skill", {
+        opacity: 0,
+        x: 200,
+        scale: 0.5,
+        
+      });
+
+      // Skill chips reveal
+      gsap.to(".ab-skill", {
+        opacity: 1,
+        x: 0,
+        scale: 1,
+        duration: 0.5,
+        stagger: 0.05,
+        ease: "back.out(1.7)",
+        scrollTrigger: {
+          trigger: ".ab-skill-container",
+          start: "top 88%",
+          toggleActions: "play none none reverse",
+        },
+      });
+    }, rootRef);
+
+    return () => ctx.revert();
+  }, []);
+
   return (
     <section className="ab-root" id="about" ref={rootRef}>
-
-      {/* Scrolling background words */}
+      {/* Ambient scrolling background words */}
       <div className="ab-bg" ref={bgRef} aria-hidden="true">
         {Array.from({ length: ROWS }, (_, r) => (
-          <div
-            key={r}
-            className="ab-bg-row"
-            style={{ animationDelay: `-${r * 1.8}s` }}
-          >
+          <div key={r} className="ab-bg-row" style={{ animationDelay: `-${r * 1.8}s` }}>
             {Array.from({ length: COLS * 2 }, (_, c) => (
-              <span key={c}>{WORDS[c % WORDS.length]}</span>
+              <span key={c}>{BG_WORDS[c % BG_WORDS.length]}</span>
             ))}
           </div>
         ))}
       </div>
 
-      {/* Spotlight */}
       <div className="ab-spotlight" ref={spotRef} style={{ opacity: 0 }} />
-
-      {/* Custom cursor */}
       <div className="ab-cursor" ref={cursorRef} style={{ opacity: 0 }} />
       <div className="ab-cursor-ring" ref={ringRef} style={{ opacity: 0 }} />
 
-      {/* Main content */}
       <div className="ab-inner">
-
         <p className="ab-eyebrow">Get to know me</p>
         <h1 className="ab-headline">
-          About <span>Me.</span>
+          <span className="ab-word">About</span>{" "}
+          <span className="ab-word ab-word--outline">Me.</span>
         </h1>
 
         <div className="ab-grid">
+          {/* Left column — bio + stats */}
+          <div className="ab-col">
+            <div className="ab-bio">
+              {BIO.map((para, i) => (
+                <p key={i}>{para}</p>
+              ))}
+            </div>
 
-          {/* Profile image */}
-          <div className="ab-img-wrap">
-            <img src={ProfilePic} alt="Profile" />
-            {/* <img src={assets.ProfilePic} alt="Profile" /> */}
-            {/* <span className="ab-img-text">My Self Abhijit Godase </span> */}
-
-
-
-
-            {/* <div className="ab-img-bg" ref={bgRef} aria-hidden="true">
-
-              {Array.from({ length: ROWS }, (_, r) => (
-                <div
-                  key={r}
-                  className="ab-img-text"
-                  style={{ animationDelay: `-${r * 1.8}s` }}
-                >
-                  {Array.from({ length: COLS * 2 }, (_, c) => (
-                    <span key={c}>{imgWords[c % imgWords.length]}</span>
-                  ))}
+            <div className="ab-stats">
+              {STATS.map((stat, i) => (
+                <div className="ab-stat" key={stat.label.join("-")}>
+                  <div className="ab-stat-num" ref={(el) => (statNumRefs.current[i] = el)}>
+                    0{stat.suffix}
+                  </div>
+                  <div className="ab-stat-label">
+                    {stat.label[0]}
+                    <br />
+                    {stat.label[1]}
+                  </div>
                 </div>
               ))}
-            </div> */}
-
-
-
-
-            <div className="ab-img-tag">
-              <strong>1+</strong>
-              <small>Yrs Exp</small>
             </div>
           </div>
 
-          {/* Bio + Skills */}
-          <div className="ab-right">
-            <div className="ab-bio">
-              <p>
-                I&apos;m a <strong>full-stack developer</strong> who loves
-                building interactive web apps that solve real-world problems —
-                from concept to shipped product.
-              </p>
-              <p>
-                Currently sharpening my skills across the{" "}
-                <strong>MERN stack</strong>, with a focus on performance, clean
-                APIs, and interfaces that feel alive.
-              </p>
-            </div>
-
-            <div className="ab-skills">
-              <p className="ab-skills-label">Technical skills</p>
-
-              <div className="ab-skill-container">
-                {SKILLS.map(({ icon: Icon, label }) => (
-
-                  <div className="ab-skill" key={label}>
-                    <Icon className="ab-skill-icon" />
-                    <span className="ab-skill-label">{label}</span>
-                  </div>
-
-                ))}
-              </div>
-
-
-
-
-              {/* {SKILLS.map(({ label, pct }) => (
-                <div className="ab-skill" key={label}>
-                  <div className="ab-skill-header">
-                    <span>{label}</span>
-                    <span>{pct}%</span>
-                  </div>
-                  <div className="ab-track">
-                    <div
-                      className="ab-fill"
-                      style={{
-                        transform: barsReady
-                          ? `scaleX(${pct / 100})`
-                          : "scaleX(0)",
-                      }}
-                    />
-                  </div>
+          {/* Right column — skills */}
+          <div className="ab-col">
+            <p className="ab-skills-label">Technical skills</p>
+            <div className="ab-skill-container">
+              {SKILLS.map((icon) => (
+                <div className="ab-skill" key={icon} title={icon}>
+                  <img
+                    className="ab-skill-icon"
+                    src={techIcons[`../../assets/techstack/${icon}.svg`]}
+                    alt={icon}
+                    loading="lazy"
+                  />
                 </div>
-              ))} */}
+              ))}
             </div>
           </div>
         </div>
-
-        {/* Stats strip */}
-        <div className="ab-stats">
-          {STATS.map(({ num, label }) => (
-            <div className="ab-stat" key={num}>
-              <div className="ab-stat-num">{num}</div>
-              <div className="ab-stat-label">
-                {label[0]}
-                <br />
-                {label[1]}
-              </div>
-            </div>
-          ))}
-        </div>
-
       </div>
     </section>
   );

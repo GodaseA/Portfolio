@@ -80,7 +80,12 @@
   justify-content: space-between;
   gap: 2rem;
   flex-wrap: wrap;
-  margin-bottom: clamp(2rem, 5vw, 3.5rem);
+}
+
+@media (max-width: 1350px) {
+  .project-header {
+    margin-bottom: clamp(2rem, 5vw, 3.5rem);
+  }
 }
 
 .project-heading {
@@ -146,28 +151,58 @@
 .project-grid {
   display: flex;
   gap: clamp(1rem, 2.5vw, 1.75rem);
-  will-change: transform;
+  /* No transform here anymore — each .project-card-track
+     is animated individually on scroll instead of the whole row. */
 }
 
-/* ─── Card ───────────────────────────────────────────────── */
-.project-card {
-  position: relative;
+/* ─── Card track (GSAP-controlled: scroll x + coverflow scale) ── */
+.project-card-track {
   flex: 0 0 auto;
   width: min(78vw, 340px);
+  will-change: transform;
+  transform-origin: center center;
+}
+
+@media (min-width: 1200px) {
+  .project-card-track {
+    width: 380px;
+  }
+}
+
+@media (min-width: 900px) and (max-width: 1199px) {
+  .project-card-track {
+    width: 320px;
+  }
+}
+
+@media (max-width: 899px) {
+  .project-card-track {
+    width: 100%;
+  }
+}
+
+/* ─── Card (CSS-controlled: hover lift + scale) ─────────────── */
+.project-card {
+  position: relative;
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
   background: var(--panel);
   border: 1px solid var(--border);
   border-radius: 10px;
   overflow: hidden;
-  transition: border-color 0.35s ease, transform 0.35s ease,
-    background 0.35s ease;
+  transform-origin: center center;
+  transition: border-color 0.35s ease, background 0.35s ease,
+    transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.45s ease;
 }
 
 .project-card:hover {
   border-color: var(--border-strong);
   background: var(--panel-hover);
-  transform: translateY(-6px);
+  transform: translateY(-28px)  ;
+  box-shadow: 0 20px 45px -20px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(110, 231, 222, 0.08);
 }
 
 .project-card-index {
@@ -253,14 +288,6 @@
   flex: 1;
 }
 
-.project-card-name {
-  font-family: var(--font-display);
-  font-weight: 600;
-  font-size: 1.28rem;
-  margin: 0;
-  letter-spacing: -0.01em;
-}
-
 .project-card-desc {
   font-size: 0.92rem;
   line-height: 1.55;
@@ -331,23 +358,8 @@
 
 /* ─── Breakpoints ────────────────────────────────────────── */
 
-/* Large desktop: roomier cards */
-@media (min-width: 1200px) {
-  .project-card {
-    width: 380px;
-  }
-}
-
-/* Tablet landscape: horizontal scroll stays active (JS matchMedia
-   threshold is 900px), just tighten card width */
-@media (min-width: 900px) and (max-width: 1199px) {
-  .project-card {
-    width: 320px;
-  }
-}
-
-/* Tablet portrait / mobile: vertical stack, no transform-driven
-   scroll — JS switches to normal document scroll below 900px */
+/* Tablet portrait / mobile: vertical stack, no scroll-jacking —
+   JS switches to normal document scroll below 900px */
 @media (max-width: 899px) {
   .project-section {
     padding: 3.5rem 0;
@@ -371,12 +383,10 @@
 
   .project-grid {
     flex-direction: column;
-    width: 100% !important;
-    transform: none !important;
   }
 
-  .project-card {
-    width: 100%;
+  .project-card:hover {
+    transform: translateY(-4px) scale(1.02);
   }
 }
 
