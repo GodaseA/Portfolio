@@ -1,21 +1,22 @@
-/* ─────────────────────────────────────────────────────────
+/*  /* ─────────────────────────────────────────────────────────
    Project.css
-   Theme: "Spec sheet" catalogue — deep ink surface, amber
-   display accent, teal utility accent, blueprint grid texture.
+   Theme: unified with the About / Experience sections —
+   dark ink surface, single crimson accent, Space Grotesk
+   display face, Inter body, JetBrains Mono for data/labels.
    ───────────────────────────────────────────────────────── */
 
 @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap");
 
 .project-section {
-  --ink: #0e1116;
-  --panel: #161b22;
-  --panel-hover: #1c222b;
-  --border: #262c35;
-  --border-strong: #3a414c;
-  --text: #f4f1ea;
-  --text-muted: #8b93a1;
-  --amber: #ffb454;
-  --teal: #6ee7de;
+  --ink: #0a0a0b;
+  --panel: #131316;
+  --panel-hover: #18181c;
+  --border: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(224, 51, 63, 0.35);
+  --text: #ffffff;
+  --text-muted: #a3a3a8;
+  --accent: #e0333f;
+  --accent-soft: rgba(224, 51, 63, 0.12);
 
   --font-display: "Space Grotesk", "Segoe UI", sans-serif;
   --font-body: "Inter", "Segoe UI", sans-serif;
@@ -23,7 +24,7 @@
 
   position: relative;
   overflow: hidden;
-  background: var(--ink);
+  background: linear-gradient(180deg, #0a0a0b 0%, #101012 100%);
   color: var(--text);
   padding: clamp(3rem, 7vw, 6rem) 0;
   font-family: var(--font-body);
@@ -36,10 +37,10 @@
   inset: 0;
   background-image: linear-gradient(
       to right,
-      rgba(110, 231, 222, 0.05) 1px,
+      rgba(224, 51, 63, 0.05) 1px,
       transparent 1px
     ),
-    linear-gradient(to bottom, rgba(110, 231, 222, 0.05) 1px, transparent 1px);
+    linear-gradient(to bottom, rgba(224, 51, 63, 0.05) 1px, transparent 1px);
   background-size: 56px 56px;
   mask-image: radial-gradient(
     ellipse 80% 60% at 50% 20%,
@@ -58,7 +59,7 @@
   height: 40vw;
   background: radial-gradient(
     circle,
-    rgba(255, 180, 84, 0.14) 0%,
+    rgba(224, 51, 63, 0.14) 0%,
     transparent 70%
   );
   filter: blur(10px);
@@ -99,7 +100,7 @@
   font-size: 0.78rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--teal);
+  color: var(--accent);
 }
 
 .project-title {
@@ -122,7 +123,7 @@
 .project-counter {
   font-family: var(--font-mono);
   font-size: 0.95rem;
-  color: var(--amber);
+  color: var(--accent);
   letter-spacing: 0.04em;
 }
 
@@ -142,7 +143,7 @@
 .project-rail-fill {
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, var(--teal), var(--amber));
+  background: var(--accent);
   transform: scaleX(0);
   transform-origin: left;
 }
@@ -190,7 +191,7 @@
   flex-direction: column;
   background: var(--panel);
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: 16px;
   overflow: hidden;
   transform-origin: center center;
   transition: border-color 0.35s ease, background 0.35s ease,
@@ -200,9 +201,9 @@
 .project-card:hover {
   border-color: var(--border-strong);
   background: var(--panel-hover);
-  transform: translateY(-28px)  ;
+  transform: translateY(-28px);
   box-shadow: 0 20px 45px -20px rgba(0, 0, 0, 0.55),
-    0 0 0 1px rgba(110, 231, 222, 0.08);
+    0 0 0 1px var(--accent-soft);
 }
 
 .project-card-index {
@@ -212,8 +213,8 @@
   z-index: 2;
   font-family: var(--font-mono);
   font-size: 0.75rem;
-  color: var(--amber);
-  background: rgba(14, 17, 22, 0.75);
+  color: var(--accent);
+  background: rgba(10, 10, 11, 0.75);
   border: 1px solid var(--border);
   padding: 0.15rem 0.5rem;
   border-radius: 4px;
@@ -250,9 +251,9 @@
   font-size: 0.68rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--teal);
-  background: rgba(14, 17, 22, 0.75);
-  border: 1px solid rgba(110, 231, 222, 0.35);
+  color: var(--text);
+  background: rgba(10, 10, 11, 0.75);
+  border: 1px solid var(--border-strong);
   padding: 0.25rem 0.55rem;
   border-radius: 999px;
 }
@@ -267,8 +268,8 @@
   width: 34px;
   height: 34px;
   border-radius: 50%;
-  background: var(--amber);
-  color: var(--ink);
+  background: var(--accent);
+  color: #ffffff;
   font-size: 1.1rem;
   opacity: 0;
   transform: translate(-6px, 6px) scale(0.85);
@@ -286,6 +287,15 @@
   gap: 0.85rem;
   padding: 1.35rem 1.25rem 1.5rem;
   flex: 1;
+}
+
+.project-card-name {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text);
+  letter-spacing: -0.01em;
 }
 
 .project-card-desc {
@@ -340,18 +350,18 @@
 }
 
 .project-link-primary {
-  color: var(--amber);
+  color: var(--accent);
   margin-left: auto;
 }
 
 .project-link-primary:hover,
 .project-link-primary:focus-visible {
-  color: var(--teal);
+  color: var(--text);
 }
 
 .project-link:focus-visible,
 .project-card-media:focus-visible {
-  outline: 2px solid var(--teal);
+  outline: 2px solid var(--accent);
   outline-offset: 3px;
   border-radius: 4px;
 }

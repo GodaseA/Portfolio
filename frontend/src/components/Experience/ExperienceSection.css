@@ -1,52 +1,67 @@
-/* ─── Experience Section ────────────────────────────────────── */
-/*
-  Design tokens (consistent with Project section):
-    --indigo : #6366F1
-    --amber  : #F59E0B
-    --surface: #1E2A3A
-    --muted  : #8B949E
-    --bg     : #0D1117
-    --text   : #E6EDF3
-*/
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500&display=swap');
 
-.ex-root {
+/* ─── Tokens ────────────────────────────────────────────── */
+.exr-root {
+  --exr-bg: #0a0a0b;
+  --exr-panel: #131316;
+  --exr-border: rgba(255, 255, 255, 0.08);
+  --exr-text: #ffffff;
+  --exr-text-dim: #a3a3a8;
+  --exr-accent: #e0333f;
+  --exr-accent-soft: rgba(224, 51, 63, 0.12);
+  --exr-road: rgba(255, 255, 255, 0.08);
+}
+
+/* ─── Root ──────────────────────────────────────────────── */
+.exr-root {
   position: relative;
-  padding: 100px 40px;
-  background: #0D1117;
-  box-sizing: border-box;
   font-family: 'Inter', sans-serif;
+  background: linear-gradient(180deg, #101012 0%, #0a0a0b 100%);
+  color: var(--exr-text);
+  box-sizing: border-box;
+  isolation: isolate;
 }
 
-/* ─── Header ─────────────────────────────────────────────── */
-.ex-header {
-  max-width: 1100px;
-  margin: 0 auto 56px;
+/* ─── Header (stays put, non-scrolling art starts below it) ─ */
+.exr-header {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  padding: 64px 40px 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+  background: linear-gradient(180deg, rgba(10, 10, 11, 0.97) 60%, rgba(10, 10, 11, 0));
+  pointer-events: none;
 }
 
-.ex-eyebrow {
+.exr-header-row,
+.exr-view-all {
+  pointer-events: auto;
+}
+
+.exr-eyebrow {
   font-family: 'Space Grotesk', sans-serif;
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 4px;
   text-transform: uppercase;
-  color: #6366F1;
+  color: var(--exr-accent);
   margin: 0 0 16px;
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
-.ex-eyebrow::after {
+.exr-eyebrow::after {
   content: '';
   display: block;
   width: 40px;
   height: 1px;
-  background: #6366F1;
+  background: var(--exr-accent);
   opacity: 0.5;
 }
 
-/* headline + button on same row */
-.ex-header-row {
+.exr-header-row {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
@@ -54,398 +69,319 @@
   flex-wrap: wrap;
 }
 
-.ex-headline {
+.exr-headline {
   font-family: 'Space Grotesk', sans-serif;
-  font-size: clamp(44px, 6vw, 76px);
+  font-size: clamp(36px, 5.5vw, 60px);
   font-weight: 700;
-  line-height: 1;
-  letter-spacing: -2px;
-  color: #F0F6FF;
+  line-height: 1.05;
+  letter-spacing: -1.5px;
   margin: 0;
+  color: var(--exr-text);
 }
 
-.ex-headline span {
-  color: transparent;
-  -webkit-text-stroke: 1.5px rgba(240, 246, 255, 0.25);
+.exr-word--accent {
+  color: var(--exr-accent);
 }
 
-/* "View all experiences" button */
-.ex-view-all {
+.exr-view-all {
   display: inline-flex;
   align-items: center;
   gap: 8px;
   font-family: 'Space Grotesk', sans-serif;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
-  color: #E6EDF3;
-  background: #1E2A3A;
-  border: 1px solid rgba(99, 102, 241, 0.3);
-  border-radius: 100px;
-  padding: 10px 20px;
+  color: var(--exr-text-dim);
   text-decoration: none;
+  padding: 10px 16px;
+  border: 1px solid var(--exr-border);
+  border-radius: 999px;
+  background: var(--exr-bg);
+  transition: color 0.25s ease, border-color 0.25s ease, background 0.25s ease;
   white-space: nowrap;
-  transition: background 0.25s, border-color 0.25s, color 0.25s, transform 0.2s;
-  margin-bottom: 6px;
 }
 
-.ex-view-all:hover {
-  background: rgba(99, 102, 241, 0.12);
-  border-color: #6366F1;
-  color: #fff;
-  transform: translateY(-1px);
+.exr-view-all:hover {
+  color: var(--exr-text);
+  border-color: rgba(224, 51, 63, 0.4);
+  background: var(--exr-accent-soft);
 }
 
-.ex-view-all-arrow {
-  transition: transform 0.25s;
+.exr-view-all-arrow {
+  transition: transform 0.25s ease;
 }
 
-.ex-view-all:hover .ex-view-all-arrow {
+.exr-view-all:hover .exr-view-all-arrow {
   transform: translate(2px, -2px);
 }
 
-/* ─── Two-column body ────────────────────────────────────── */
-.ex-body {
-  max-width: 1100px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: 1fr 380px;
-  gap: 48px;
-  align-items: start;
-}
-
-/* ─── Left: timeline list ────────────────────────────────── */
-.ex-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.07);
-}
-
-.ex-list li {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
-}
-
-.ex-row {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  padding: 22px 8px;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  text-align: left;
-  transition: padding-left 0.25s ease, background 0.2s;
-  border-radius: 4px;
-  outline: none;
-}
-
-.ex-row:hover {
-  padding-left: 16px;
-  background: rgba(99, 102, 241, 0.04);
-}
-
-.ex-row--active {
-  padding-left: 16px;
-  background: rgba(99, 102, 241, 0.07);
-}
-
-.ex-row:focus-visible {
-  outline: 2px solid #6366F1;
-  outline-offset: 2px;
-}
-
-/* Index */
-.ex-index {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 1px;
-  color: rgba(99, 102, 241, 0.35);
-  min-width: 26px;
-  transition: color 0.25s;
-}
-
-.ex-row:hover .ex-index,
-.ex-row--active .ex-index {
-  color: #6366F1;
-}
-
-/* Timeline marker (dot + line) */
-.ex-marker {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  flex-shrink: 0;
-  width: 28px;
+/* ─── Road wrapper ──────────────────────────────────────── */
+.exr-road-wrap {
   position: relative;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  height: 100%;
+  padding-top: 20px;
 }
 
-.ex-dot {
-  width: 12px;
-  height: 12px;
-  background: #6366F1;
+.exr-road-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.exr-road-base {
+  stroke: var(--exr-road);
+  stroke-width: 30;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.exr-road-progress {
+  stroke: var(--exr-accent);
+  stroke-width: 30;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 10px rgba(224, 51, 63, 0.5));
+  vector-effect: non-scaling-stroke;
+  opacity: 0.9;
+}
+
+.exr-road-lane-base {
+  stroke: rgba(255, 255, 255, 0.4);
+  stroke-width: 1;
+  stroke-linecap: round;
+  stroke-dasharray: 6 7;
+  vector-effect: non-scaling-stroke;
+  pointer-events: none;
+}
+
+/* ─── Vehicle ───────────────────────────────────────────── */
+.exr-car {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 62px;
+  height: 62px;
+  transform: translate(-50%, -50%);
+  z-index: 4;
+  pointer-events: none;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.5));
+  will-change: left, top, transform;
+}
+
+.exr-car-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+/* ─── Stops ─────────────────────────────────────────────── */
+/* Each stop is a full-width horizontal strip pinned at its Y position.
+   The pin marker always sits dead-center on the road; the card is
+   positioned to one side or the other via the --left/--right variant,
+   independent of the pin, so the road stays perfectly straight. */
+.exr-stop {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 0;
+  z-index: 3;
+}
+
+.exr-pin {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
-  border: 2px solid #0D1117;
-  box-shadow: 0 0 0 2px #6366F1, 0 4px 12px rgba(99, 102, 241, 0.25);
+  border: 1px solid var(--exr-border);
+  background: var(--exr-panel);
+  color: var(--exr-text-dim);
   flex-shrink: 0;
-  transition: all 0.3s ease;
   z-index: 2;
+  transition: border-color 0.3s ease, background 0.3s ease, transform 0.3s ease;
 }
 
-.ex-row:hover .ex-dot,
-.ex-row--active .ex-dot {
-  transform: scale(1.2);
-  box-shadow: 0 0 0 3px #6366F1, 0 6px 20px rgba(99, 102, 241, 0.35);
-}
-
-.ex-line {
-  width: 2px;
-  flex: 1;
-  min-height: 20px;
-  background: linear-gradient(to bottom, #6366F1, rgba(99, 102, 241, 0.1));
-  margin-top: 4px;
-  border-radius: 2px;
-}
-
-/* Company name */
-.ex-company {
+.exr-pin-index {
   font-family: 'Space Grotesk', sans-serif;
-  font-size: clamp(16px, 2vw, 20px);
-  font-weight: 600;
-  color: #8B949E;
-  flex: 1;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  transition: color 0.25s;
-}
-
-.ex-row:hover .ex-company,
-.ex-row--active .ex-company {
-  color: #F0F6FF;
-}
-
-/* Date badge */
-.ex-date {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-  color: #6366F1;
-  background: rgba(99, 102, 241, 0.08);
-  border: 1px solid rgba(99, 102, 241, 0.15);
-  border-radius: 20px;
-  padding: 3px 10px;
-  flex-shrink: 0;
-  transition: background 0.25s, border-color 0.25s;
-  white-space: nowrap;
-}
-
-.ex-row:hover .ex-date,
-.ex-row--active .ex-date {
-  background: rgba(99, 102, 241, 0.14);
-  border-color: rgba(99, 102, 241, 0.35);
-}
-
-/* Chevron */
-.ex-chevron {
-  color: rgba(255, 255, 255, 0.15);
-  flex-shrink: 0;
-  transition: color 0.25s, transform 0.25s;
-}
-
-.ex-row:hover .ex-chevron,
-.ex-row--active .ex-chevron {
-  color: #6366F1;
-  transform: translateX(3px);
-}
-
-/* ─── Right: sticky detail panel ────────────────────────── */
-.ex-panel {
-  position: sticky;
-  top: 100px;
-  background: #1E2A3A;
-  border: 1px solid rgba(99, 102, 241, 0.15);
-  border-radius: 20px;
-  overflow: hidden;
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4);
-}
-
-/* Panel body */
-.ex-panel-body {
-  padding: 28px 28px 32px;
-}
-
-.ex-panel-title {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 22px;
+  font-size: 8px;
   font-weight: 700;
-  color: #F0F6FF;
-  margin: 0 0 4px;
-  animation: ex-fadeIn 0.35s ease both;
 }
 
-.ex-panel-company {
-  font-size: 16px;
-  font-weight: 600;
-  color: #6366F1;
-  margin: 0 0 4px;
-  animation: ex-fadeIn 0.35s ease both;
+.exr-pin-dot {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 1px solid transparent;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-.ex-panel-date {
-  font-size: 13px;
-  color: #8B949E;
-  margin: 0 0 16px;
-  animation: ex-fadeIn 0.35s ease both;
+.exr-stop--reached .exr-pin {
+  border-color: rgba(224, 51, 63, 0.6);
+  background: var(--exr-accent-soft);
+  color: var(--exr-text);
+  transform: translate(-50%, -50%) scale(1.08);
 }
 
-.ex-panel-divider {
-  height: 1px;
-  background: rgba(255, 255, 255, 0.08);
-  margin: 0 0 16px;
+.exr-stop--reached .exr-pin-dot {
+  border-color: rgba(224, 51, 63, 0.35);
+  box-shadow: 0 0 0 4px var(--exr-accent-soft);
 }
 
-.ex-panel-desc {
-  font-size: 14px;
-  line-height: 1.7;
-  color: #8B949E;
-  margin: 0 0 18px;
-  animation: ex-fadeIn 0.35s ease both;
+/* ─── Info card ─────────────────────────────────────────── */
+/* Content is always fully visible — no hover/expand step. */
+.exr-card {
+  position: absolute;
+  top: 0;
+  transform: translateY(-50%);
+  width: min(300px, 38vw);
+  background: var(--exr-panel);
+  border: 1px solid var(--exr-border);
+  border-radius: 16px;
+  padding: 16px 18px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-.ex-panel-achievements {
-  list-style: none;
-  padding: 0;
-  margin: 0 0 18px;
-  animation: ex-fadeIn 0.35s ease both;
+.exr-stop--right .exr-card {
+  left: calc(50% + 26px);
 }
 
-.ex-panel-achievements li {
-  font-size: 13px;
-  color: #B0B8C4;
-  padding: 4px 0 4px 22px;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%236366F1' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'%3E%3C/polyline%3E%3C/svg%3E") left center no-repeat;
-  background-size: 14px;
-  line-height: 1.5;
+.exr-stop--left .exr-card {
+  right: calc(50% + 26px);
 }
 
-.ex-panel-tech {
+.exr-stop--reached .exr-card {
+  border-color: rgba(224, 51, 63, 0.35);
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.4);
+}
+
+.exr-card-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.exr-card-logo {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  object-fit: cover;
+  border: 1px solid var(--exr-border);
+  flex-shrink: 0;
+}
+
+.exr-card-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  margin: 0 0 2px;
+  color: var(--exr-text);
+  line-height: 1.3;
+}
+
+.exr-card-company {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--exr-accent);
+  margin: 0 0 2px;
+}
+
+.exr-card-date {
+  font-size: 10.5px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--exr-text-dim);
+  margin: 0;
+}
+
+.exr-card-tech {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  margin-top: 4px;
-  animation: ex-fadeIn 0.35s ease both;
+  margin-top: 12px;
 }
 
-.ex-panel-tech span {
-  background: rgba(255, 255, 255, 0.06);
-  color: #B0B8C4;
-  font-size: 11px;
-  font-weight: 500;
-  padding: 4px 14px;
-  border-radius: 30px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  transition: border-color 0.3s, background 0.3s;
+.exr-card-tech span {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 4px 9px;
+  border-radius: 999px;
+  border: 1px solid var(--exr-border);
+  color: var(--exr-text-dim);
+  background: rgba(255, 255, 255, 0.02);
 }
 
-.ex-panel-tech span:hover {
-  border-color: rgba(99, 102, 241, 0.3);
-  background: rgba(99, 102, 241, 0.08);
-}
-
-@keyframes ex-fadeIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: translateY(0);    }
-}
-
-/* ─── Responsive ─────────────────────────────────────────── */
-
-/* Medium: narrow the panel */
+/* ─── Responsive ────────────────────────────────────────── */
 @media (max-width: 900px) {
-  .ex-body {
-    grid-template-columns: 1fr 300px;
-    gap: 32px;
+  .exr-card {
+    width: min(260px, 42vw);
   }
 }
 
-/* Mobile: stack vertically, panel goes below list */
-@media (max-width: 700px) {
-  .ex-root {
-    padding: 72px 20px;
+@media (max-width: 720px) {
+  /* Not enough room either side of a centered road on small screens —
+     shift the road toward the left edge and stack every card on the
+     right, full width, still always fully visible. */
+  .exr-header {
+    padding: 48px 20px 20px;
   }
 
-  .ex-body {
-    grid-template-columns: 1fr;
-    gap: 0;
+  .exr-road-wrap {
+    padding-top: 8px;
   }
 
-  .ex-panel {
-    position: static;
-    margin-top: 32px;
+  .exr-road-svg {
+    /* nudges the whole coordinate system's visual left/right split via
+       the road-wrap padding rather than re-computing the path */
   }
 
-  .ex-header-row {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 20px;
+  .exr-pin {
+    left: 16%;
   }
 
-  .ex-date {
-    display: none;
+  .exr-car {
+    left: 16%;
+    width: 50px;
+    height: 50px;
   }
 
-  .ex-view-all {
-    margin-bottom: 0;
-  }
-}
-
-@media (max-width: 480px) {
-  .ex-row {
-    gap: 12px;
-    padding: 18px 6px;
+  .exr-stop--right .exr-card,
+  .exr-stop--left .exr-card {
+    left: calc(16% + 22px);
+    right: auto;
+    width: min(70vw, 280px);
   }
 
-  .ex-company {
-    font-size: 15px;
-  }
-
-  .ex-panel-body {
-    padding: 18px 18px 22px;
-  }
-
-  .ex-panel-title {
-    font-size: 19px;
-  }
-
-  .ex-marker {
-    width: 20px;
-  }
-
-  .ex-dot {
-    width: 10px;
-    height: 10px;
+  .exr-road-base,
+  .exr-road-progress,
+  .exr-road-lane-base {
+    transform: translateX(-34%);
   }
 }
 
-/* ─── Reduced motion ─────────────────────────────────────── */
+@media (max-width: 420px) {
+  .exr-headline {
+    font-size: 34px;
+  }
+
+  .exr-card {
+    padding: 14px 16px;
+  }
+}
+
+/* ─── Reduced motion ────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
-  .ex-panel-title,
-  .ex-panel-company,
-  .ex-panel-date,
-  .ex-panel-desc,
-  .ex-panel-achievements,
-  .ex-panel-tech {
-    animation: none;
-  }
-
-  .ex-row,
-  .ex-view-all {
-    transition: none;
-  }
-
-  .ex-dot {
+  .exr-road-progress,
+  .exr-car {
     transition: none;
   }
 }

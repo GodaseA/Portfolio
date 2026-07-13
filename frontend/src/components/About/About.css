@@ -1,4 +1,4 @@
- @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500&display=swap');
 
 /* ─── Tokens ───────────────────────────────────────────── */
 .ab-root {
@@ -176,6 +176,140 @@
   gap: 48px;
 }
 
+.ab-col--hang {
+  align-items: center;
+}
+
+/* ─── Hanging ID card ──────────────────────────────────── */
+.ab-hang-wrap {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.ab-hang-svg {
+  width: 100%;
+  max-width: 260px;
+  height: auto;
+  overflow: visible;
+}
+
+.ab-rope {
+  fill: none;
+  stroke: #8a6d4b;
+  stroke-width: 3.5;
+  stroke-linecap: round;
+}
+
+.ab-hook rect {
+  fill: #3a3a3f;
+}
+
+.ab-hook circle {
+  fill: none;
+  stroke: #8a6d4b;
+  stroke-width: 3;
+}
+
+.ab-card {
+  cursor: grab;
+  touch-action: none;
+}
+
+.ab-card:active {
+  cursor: grabbing;
+}
+
+.ab-clasp {
+  fill: #b8b8bc;
+  stroke: #8c8c90;
+  stroke-width: 1;
+}
+
+.ab-clasp-hole {
+  fill: #0a0a0b;
+}
+
+.ab-card-body {
+  fill: #f5f2ea;
+  stroke: rgba(0, 0, 0, 0.08);
+  stroke-width: 1;
+}
+
+.ab-card-topbar {
+  fill: var(--ab-accent);
+}
+
+.ab-card-avatar {
+  fill: rgba(255, 255, 255, 0.22);
+  stroke: rgba(255, 255, 255, 0.6);
+  stroke-width: 1.5;
+}
+
+.ab-card-initials {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  fill: #ffffff;
+}
+
+.ab-card-name {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  fill: #16161a;
+}
+
+.ab-card-role {
+  font-family: 'Inter', sans-serif;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  fill: #6b6b70;
+}
+
+.ab-card-divider {
+  stroke: rgba(0, 0, 0, 0.12);
+  stroke-width: 1;
+}
+
+.ab-card-label {
+  font-family: 'Inter', sans-serif;
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  fill: #9a9a9e;
+}
+
+.ab-card-value {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  fill: #16161a;
+}
+
+.ab-card-value--accent {
+  fill: var(--ab-accent);
+}
+
+.ab-card-barcode rect {
+  fill: #1c1c1f;
+  opacity: 0.75;
+}
+
+.ab-hang-hint {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--ab-text-dim);
+  opacity: 0.6;
+  margin: 0;
+}
+
 /* ─── Bio ──────────────────────────────────────────────── */
 .ab-bio p {
   font-size: 17px;
@@ -201,6 +335,7 @@
   border-radius: 16px;
   overflow: hidden;
   background: var(--ab-panel);
+  width: 100%;
 }
 
 .ab-stat {
@@ -268,8 +403,6 @@
 }
 
 .ab-skill:hover {
-  /* background: var(--ab-accent-soft); */
-  /* border-color: rgba(224, 51, 63, 0.4); */
   transform: translateY(-30px);
 }
 
@@ -295,6 +428,10 @@
   .ab-grid {
     grid-template-columns: 1fr;
     gap: 40px;
+  }
+
+  .ab-col--hang {
+    order: -1;
   }
 
   .ab-headline {
@@ -347,6 +484,10 @@
   }
 
   .ab-bg-row span {
+    transition: none;
+  }
+
+  .ab-card {
     transition: none;
   }
 }

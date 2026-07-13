@@ -1,0 +1,111 @@
+.hid-root {
+  --hid-bg: #0a0a0b;
+  --hid-panel: #131316;
+  --hid-border: rgba(255, 255, 255, 0.1);
+  --hid-text: #ffffff;
+  --hid-text-dim: #a3a3a8;
+  --hid-accent: #e0333f;
+
+  width: 100%;
+  max-width: 420px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.hid-svg {
+  width: 100%;
+  height: auto;
+  /* display: block; */
+  overflow: visible;
+  pointer-events: auto;
+}
+
+.hid-rope {
+  stroke: #5a5a5f;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.hid-clip {
+  fill: #2a2a2e;
+  stroke: rgba(255, 255, 255, 0.15);
+  stroke-width: 1;
+}
+
+.hid-card-group {
+  cursor: grab;
+  touch-action: none;
+}
+
+.hid-card-group:active {
+  cursor: grabbing;
+}
+
+.hid-card-bg {
+  fill: var(--hid-panel);
+  stroke: var(--hid-border);
+  stroke-width: 1;
+}
+
+.hid-card-band {
+  fill: var(--hid-accent);
+}
+
+.hid-band-text {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  fill: #ffffff;
+}
+
+.hid-avatar-ring {
+  fill: rgba(224, 51, 63, 0.12);
+  stroke: var(--hid-accent);
+  stroke-width: 1.5;
+}
+
+.hid-avatar-text {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  fill: var(--hid-text);
+}
+
+.hid-name {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  fill: var(--hid-text);
+}
+
+.hid-title {
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  fill: var(--hid-accent);
+}
+
+.hid-divider {
+  stroke: var(--hid-border);
+  stroke-width: 1;
+}
+
+.hid-detail {
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  fill: var(--hid-text-dim);
+}
+
+.hid-barcode {
+  fill: rgba(255, 255, 255, 0.35);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hid-card-group {
+    transition: none;
+  }
+}

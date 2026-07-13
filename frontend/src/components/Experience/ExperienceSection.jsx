@@ -1,175 +1,260 @@
-import React, { useState } from 'react';
-import { FiBriefcase, FiExternalLink } from 'react-icons/fi';
-import './ExperienceSection.css';
+import { useEffect, useRef, useState, useMemo } from "react";
+import { FiExternalLink } from "react-icons/fi";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import "./ExperienceSection.css";
+import img from "../../assets/demo.jpg";
+import carImg from "../../assets/mydemo.png";
+
+gsap.registerPlugin(ScrollTrigger);
 
 /* ─── Data ───────────────────────────────────────────────── */
+/* Trimmed: description + achievements removed, tech list capped at 3
+   since the card now shows everything at once with no expand step. */
 const EXPERIENCES = [
   {
     id: 1,
-    company: 'TechVault Solutions',
-    date: 'Jan 2022 – Present',
-    title: 'Senior Full-Stack Engineer',
-    description:
-      'Led a team of 12 engineers building a cloud-native document management system. Architected microservices with Node.js and React, reducing latency by 40%.',
-    achievements: [
-      'Migrated legacy monolith to Kubernetes-based microservices.',
-      'Implemented real-time collaboration features using WebSockets.',
-      'Mentored 5 junior developers through code reviews and pair programming.',
-    ],
-    tech: ['React', 'Node.js', 'TypeScript', 'Kubernetes', 'MongoDB'],
+    logo: img,
+    company: "NeuSpaarX Technologies Pvt. Ltd.",
+    date: "Feb 2026 – Present",
+    title: "Full-Stack Engineer",
+    tech: ["React", "Node.js", "Kubernetes"],
   },
   {
     id: 2,
-    company: 'Apex Fintech Inc.',
-    date: 'Jun 2019 – Dec 2021',
-    title: 'Frontend Developer',
-    description:
-      'Built and maintained the consumer-facing dashboard for a high-growth trading platform. Focused on performance, accessibility, and pixel-perfect UI.',
-    achievements: [
-      'Redesigned the portfolio tracker, increasing user engagement by 25%.',
-      'Introduced Jest and Cypress testing, raising coverage from 40% to 85%.',
-      'Collaborated with UX designers to implement a responsive design system.',
-    ],
-    tech: ['React', 'Redux', 'Tailwind CSS', 'Jest', 'Webpack'],
+    logo: img,
+    company: "ERC",
+    date: "Sep 2025 – Present",
+    title: "Frontend Developer",
+    tech: ["React", "Redux", "Tailwind CSS"],
   },
   {
     id: 3,
-    company: 'CloudSphere AI',
-    date: 'Aug 2017 – May 2019',
-    title: 'Junior Software Engineer',
-    description:
-      'Developed features for an AI-driven analytics platform. Worked on both frontend and backend, with a focus on data visualization and REST APIs.',
-    achievements: [
-      'Built interactive charts and dashboards using D3.js and Recharts.',
-      'Optimized API response times by 30% with caching and indexing.',
-      'Maintained CI/CD pipelines using GitHub Actions and Docker.',
-    ],
-    tech: ['React', 'Python', 'Flask', 'D3.js', 'PostgreSQL'],
-  },
-  {
-    id: 4,
-    company: 'EdgeWare Systems',
-    date: 'Jan 2016 – Jul 2017',
-    title: 'Software Engineer Intern',
-    description:
-      'Worked on the backend team building RESTful APIs for an enterprise resource planning system. Gained hands-on experience with database design and testing.',
-    achievements: [
-      'Developed 15+ REST endpoints for inventory management.',
-      'Wrote unit and integration tests using Jest and Supertest.',
-      'Assisted in migrating from MySQL to PostgreSQL.',
-    ],
-    tech: ['Node.js', 'Express', 'PostgreSQL', 'Jest', 'Docker'],
-  },
-  {
-    id: 5,
-    company: 'NovaTech Labs',
-    date: 'Sep 2015 – Dec 2015',
-    title: 'Frontend Intern',
-    description:
-      'Assisted in building a design system and component library for a healthcare startup. Focused on accessibility and cross-browser compatibility.',
-    achievements: [
-      'Built 12 reusable React components with Storybook.',
-      'Implemented dark mode support using CSS variables.',
-      'Optimized bundle size by 30% with code splitting.',
-    ],
-    tech: ['React', 'Storybook', 'CSS Modules', 'Webpack'],
-  },
-  {
-    id: 6,
-    company: 'CodeMentor Hub',
-    date: 'Jan 2015 – Aug 2015',
-    title: 'Teaching Assistant',
-    description:
-      'Supported 50+ students in an intensive web development bootcamp. Led code reviews, held office hours, and created supplementary learning materials.',
-    achievements: [
-      'Assisted students with JavaScript, React, and Node.js coursework.',
-      'Conducted weekly code review sessions for 20 project teams.',
-      'Created a 20-page guide on best practices for React hooks.',
-    ],
-    tech: ['JavaScript', 'React', 'Node.js', 'Git'],
+    logo: img,
+    company: "Webstack Academy",
+    date: "Dec 2025 – Jan 2026",
+    title: "Full Stack Web Development in MERN",
+    tech: ["React", "Python", "D3.js"],
   },
 ];
 
-/* ─── Component ──────────────────────────────────────────── */
+/* ─── Road geometry helpers ──────────────────────────────── */
+// Viewbox units — arbitrary, everything is expressed as % of these so the
+// whole thing is naturally responsive (SVG + markers share the same math).
+// The road is a straight vertical line pinned to the center of the
+// viewBox; stops alternate left/right of it.
+const VB_W = 100;
+const ROAD_X = 50; // dead center
+const STEP_Y = 85;
+const START_Y = 40;
+const END_PAD = 45;
+
+function buildWaypoints(count, roadX) {
+  const pts = [{ x: roadX, y: 0 }];
+  for (let i = 0; i < count; i++) {
+    pts.push({ x: roadX, y: START_Y + i * STEP_Y });
+  }
+  pts.push({ x: roadX, y: START_Y + (count - 1) * STEP_Y + END_PAD });
+  return pts;
+}
+
+// Straight vertical line through the waypoints.
+function buildPathD(points) {
+  let d = `M ${points[0].x} ${points[0].y}`;
+  for (let i = 1; i < points.length; i++) {
+    const prev = points[i - 1];
+    const curr = points[i];
+    const midY = (prev.y + curr.y) / 2;
+    d += ` C ${prev.x} ${midY}, ${curr.x} ${midY}, ${curr.x} ${curr.y}`;
+  }
+  return d;
+}
+
+// Length (in path units) from the start up to and including points[0..idx]
+function partialLength(points, idx) {
+  const sub = points.slice(0, idx + 1);
+  if (sub.length < 2) return 0;
+  const tmp = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  tmp.setAttribute("d", buildPathD(sub));
+  return tmp.getTotalLength();
+}
+
 export default function ExperienceSection() {
-  const [active, setActive] = useState(EXPERIENCES[0]);
+  const sectionRef = useRef(null);
+  const pathRef = useRef(null);
+  const carRef = useRef(null);
+  const [activeIndex, setActiveIndex] = useState(-1);
+
+  const waypoints = useMemo(() => buildWaypoints(EXPERIENCES.length, ROAD_X), []);
+  const pathD = useMemo(() => buildPathD(waypoints), [waypoints]);
+  const vbHeight = waypoints[waypoints.length - 1].y;
+
+  // stop coordinates are just the waypoints that correspond to a company
+  // (index 0 is the lead-in point, last is the lead-out point)
+  const stops = waypoints.slice(1, waypoints.length - 1);
+
+  useEffect(() => {
+    const path = pathRef.current;
+    const car = carRef.current;
+    if (!path || !car) return;
+
+    const totalLength = path.getTotalLength();
+    const stopFractions = stops.map((_, i) => partialLength(waypoints, i + 1) / totalLength);
+
+    // draw-on-scroll road tint
+    path.style.strokeDasharray = `${totalLength}`;
+
+    const ctx = gsap.context(() => {
+      // Entrance
+      gsap.from(".exr-eyebrow", { opacity: 0, x: -24, duration: 0.5, ease: "power2.out" });
+      gsap.from(".exr-word", {
+        opacity: 0,
+        y: 32,
+        duration: 0.6,
+        stagger: 0.12,
+        ease: "power3.out",
+        delay: 0.1,
+      });
+      gsap.from(".exr-view-all", { opacity: 0, x: 16, duration: 0.5, ease: "power2.out", delay: 0.3 });
+
+      // Scroll-driven journey
+      ScrollTrigger.create({
+        trigger: sectionRef.current,
+        start: "top top+=80",
+        end: "bottom bottom",
+        scrub: 0.6,
+        onUpdate: (self) => {
+          const progress = self.progress;
+          const len = progress * totalLength;
+          const pt = path.getPointAtLength(len);
+          const ahead = path.getPointAtLength(Math.min(len + 1, totalLength));
+          const behind = path.getPointAtLength(Math.max(len - 1, 0));
+          const angle = Math.atan2(ahead.y - behind.y, ahead.x - behind.x) * (180 / Math.PI);
+
+          const leftPct = (pt.x / VB_W) * 100;
+          const topPct = (pt.y / vbHeight) * 100;
+
+          car.style.left = `${leftPct}%`;
+          car.style.top = `${topPct}%`;
+          // Assumes carImg's default artwork faces "up" (nose at top).
+          // If your image faces a different way, tweak the +90 offset below.
+          car.style.transform = `translate(-50%, -50%) rotate(${angle + 90}deg)`;
+
+          path.style.strokeDashoffset = `${totalLength * (1 - progress)}`;
+
+          let reached = -1;
+          for (let i = 0; i < stopFractions.length; i++) {
+            if (progress >= stopFractions[i] - 0.015) reached = i;
+          }
+          setActiveIndex((prev) => (prev === reached ? prev : reached));
+        },
+      });
+
+      gsap.utils.toArray(".exr-stop").forEach((el, i) => {
+        gsap.from(el, {
+          opacity: 0,
+          x: i % 2 === 0 ? 40 : -40, // enters from its own side (right stops from right, left from left)
+          duration: 0.7,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: el,
+            start: "top 80%",
+            toggleActions: "play none none reverse",
+          },
+        });
+      });
+    }, sectionRef);
+
+    return () => ctx.revert();
+  }, [stops, waypoints, vbHeight]);
 
   return (
-    <section id="experience" className="ex-root">
+    <section
+      id="experience"
+      className="exr-root"
+      ref={sectionRef}
+      style={{ height: `${EXPERIENCES.length * 95}vh` }}
+    >
       {/* Header */}
-      <div className="ex-header">
-        <p className="ex-eyebrow">Career Timeline</p>
-        <div className="ex-header-row">
-          <h2 className="ex-headline">
-            Professional <span>Experience.</span>
+      <div className="exr-header">
+        <p className="exr-eyebrow">The Road So Far</p>
+        <div className="exr-header-row">
+          <h2 className="exr-headline">
+            <span className="exr-word">Professional</span>{" "}
+            <span className="exr-word exr-word--accent">Experience.</span>
           </h2>
-          <a
-            href="https://linkedin.com"
-            target="_blank"
-            rel="noreferrer"
-            className="ex-view-all"
-          >
+          <a href="https://linkedin.com" target="_blank" rel="noreferrer" className="exr-view-all">
             <FiExternalLink size={16} />
             View Full Resume
-            <svg className="ex-view-all-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M3 13L13 3M13 3H6M13 3V10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            <svg className="exr-view-all-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path
+                d="M3 13L13 3M13 3H6M13 3V10"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </svg>
           </a>
         </div>
       </div>
 
-      {/* Two-column body */}
-      <div className="ex-body">
-        {/* Left: experience list */}
-        <ul className="ex-list" role="list">
-          {EXPERIENCES.map((exp, i) => (
-            <li key={exp.id}>
-              <button
-                className={`ex-row ${active.id === exp.id ? 'ex-row--active' : ''}`}
-                onMouseEnter={() => setActive(exp)}
-                onClick={() => setActive(exp)}
-                aria-pressed={active.id === exp.id}
-              >
-                <span className="ex-index">0{i + 1}</span>
+      {/* Road + stops */}
+      <div className="exr-road-wrap">
+        <svg
+          className="exr-road-svg"
+          viewBox={`0 0 ${VB_W} ${vbHeight}`}
+          preserveAspectRatio="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          {/* base (unfinished) road */}
+          <path d={pathD} className="exr-road-base" fill="none" />
+          {/* traveled road, revealed as you scroll */}
+          <path ref={pathRef} d={pathD} className="exr-road-progress" fill="none" />
+          {/* lane markings */}
+          <path d={pathD} className="exr-road-lane-base" fill="none" />
+        </svg>
 
-                {/* Timeline marker */}
-                <div className="ex-marker">
-                  <div className="ex-dot" />
-                  {i < EXPERIENCES.length - 1 && <div className="ex-line" />}
-                </div>
-
-                <span className="ex-company">{exp.company}</span>
-
-                <span className="ex-date">{exp.date}</span>
-
-                <svg className="ex-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none">
-                  <path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </button>
-            </li>
-          ))}
-        </ul>
-
-        {/* Right: sticky detail panel */}
-        <div className="ex-panel" aria-live="polite" aria-atomic="true">
-          <div className="ex-panel-body">
-            <h3 className="ex-panel-title">{active.title}</h3>
-            <p className="ex-panel-company">{active.company}</p>
-            <p className="ex-panel-date">{active.date}</p>
-            <div className="ex-panel-divider" />
-            <p className="ex-panel-desc">{active.description}</p>
-            <ul className="ex-panel-achievements">
-              {active.achievements.map((item, i) => (
-                <li key={i}>{item}</li>
-              ))}
-            </ul>
-            <div className="ex-panel-tech">
-              {active.tech.map((t, i) => (
-                <span key={i}>{t}</span>
-              ))}
-            </div>
-          </div>
+        {/* Vehicle */}
+        <div className="exr-car" ref={carRef} aria-hidden="true">
+          <img src={carImg} alt="" className="exr-car-img" />
         </div>
+
+        {/* Stop markers + info cards — alternate left/right of the
+            centered road. Content is fully visible at all times. */}
+        {stops.map((pt, i) => {
+          const exp = EXPERIENCES[i];
+          const isReached = i <= activeIndex;
+          const side = i % 2 === 0 ? "right" : "left";
+          return (
+            <div
+              key={exp.id}
+              className={`exr-stop exr-stop--${side} ${isReached ? "exr-stop--reached" : ""}`}
+              style={{ top: `${(pt.y / vbHeight) * 100}%` }}
+            >
+              <span className="exr-pin" aria-hidden="true">
+                <span className="exr-pin-index">0{i + 1}</span>
+                <span className="exr-pin-dot" />
+              </span>
+
+              <div className="exr-card">
+                <div className="exr-card-top">
+                  <img className="exr-card-logo" src={exp.logo} alt="" />
+                  <div>
+                    <h3 className="exr-card-title">{exp.title}</h3>
+                    <p className="exr-card-company">{exp.company}</p>
+                    <p className="exr-card-date">{exp.date}</p>
+                  </div>
+                </div>
+                <div className="exr-card-tech">
+                  {exp.tech.map((t, j) => (
+                    <span key={j}>{t}</span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          );
+        })}
       </div>
     </section>
   );
