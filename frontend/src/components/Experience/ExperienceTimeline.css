@@ -1,0 +1,548 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500&display=swap');
+
+/* ─── Tokens ───────────────────────────────────────────── */
+.et-root {
+  --et-bg: #080809;
+  --et-panel: #131316;
+  --et-border: rgba(255, 255, 255, 0.09);
+  --et-text: #ffffff;
+  --et-text-dim: #9a9aa2;
+  --et-accent: #e0333f;
+  --et-accent-soft: rgba(224, 51, 63, 0.12);
+}
+
+/* Box-sizing safety net: with box-sizing: border-box guaranteed
+   everywhere inside this section, padding/border never silently
+   add to an element's width and push it past its container —
+   the exact class of bug that broke the card layout below. */
+.et-root,
+.et-root *,
+.et-root *::before,
+.et-root *::after {
+  box-sizing: border-box;
+}
+
+/* ─── Root — full page width ───────────────────────────── */
+.et-root {
+  position: relative;
+  font-family: 'Inter', sans-serif;
+  background: #050506;
+  color: var(--et-text);
+  width: 100%;
+  max-width: 100vw;
+  padding: 100px 0;
+  overflow: hidden;
+}
+
+/* Content stays readable while the section itself spans full width */
+.et-container {
+  position: relative;
+  z-index: 2;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 40px;
+}
+
+/* ─── Animated background ──────────────────────────────── */
+.et-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+
+/* Decorative binary grid — cell/row counts are computed in JS
+   (via ResizeObserver) to exactly match the container's actual
+   size, so this never overflows or leaves gaps on any screen. */
+.grid {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  z-index: 1;
+}
+
+.cell {
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-width: 0;
+  min-height: 0;
+}
+
+.cell p {
+  margin: 0;
+  font-size: 11px;
+  color: var(--et-text-dim);
+  opacity: 0.15;
+  /* Lightweight CSS-driven blink instead of a perpetual per-cell
+     GSAP loop — hundreds/thousands of live JS tweens running at
+     once was the main cause of jank and unresponsiveness on
+     lower-powered devices. */
+  animation: et-cell-blink var(--cell-duration, 6s) ease-in-out infinite;
+  animation-delay: var(--cell-delay, 0s);
+}
+
+@keyframes et-cell-blink {
+  0%,
+  100% {
+    color: var(--et-text-dim);
+    opacity: 0.12;
+  }
+  50% {
+    color: var(--et-accent);
+    opacity: 0.55;
+  }
+}
+
+.et-glow-wrap {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+.et-glow {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+}
+
+.et-glow--1 {
+  width: 520px;
+  height: 520px;
+  top: -140px;
+  left: 8%;
+  background: radial-gradient(circle, rgba(224, 51, 63, 0.28) 0%, transparent 70%);
+}
+
+.et-glow--2 {
+  width: 620px;
+  height: 620px;
+  bottom: -220px;
+  right: 6%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.06) 0%, transparent 70%);
+}
+
+/* ─── Header ───────────────────────────────────────────── */
+.et-header {
+  margin-bottom: 56px;
+}
+
+.et-eyebrow {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--et-accent);
+  margin: 0 0 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.et-eyebrow::after {
+  content: '';
+  display: block;
+  width: 40px;
+  height: 1px;
+  background: var(--et-accent);
+  opacity: 0.5;
+}
+
+.et-headline {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(36px, 5.5vw, 54px);
+  font-weight: 700;
+  letter-spacing: -1px;
+  margin: 0;
+}
+
+.et-headline span {
+  color: var(--et-accent);
+}
+
+/* ─── Card list ────────────────────────────────────────── */
+.et-list {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  width: 100%;
+}
+
+.et-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  align-items: start;
+  gap: 20px;
+  /* Was `width: max-content`, which sizes the card to fit its
+     content without wrapping — on narrow viewports that made
+     cards wider than the screen, forcing overflow that `.et-root`
+     could only clip rather than lay out correctly. `width: 100%`
+     lets the card fill (and wrap within) its actual container. */
+  width: 100%;
+  max-width: 100%;
+  padding: 28px 24px;
+  background: #242323;
+  border-radius: 24px;
+}
+
+/* Timeline marker */
+.et-marker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.et-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--et-accent);
+  box-shadow: 0 0 0 4px var(--et-accent-soft);
+  flex-shrink: 0;
+  margin-top: 6px;
+}
+
+.et-line {
+  width: 1px;
+  flex: 1;
+  min-height: 40px;
+  background: var(--et-border);
+  margin-top: 8px;
+}
+
+.et-logo {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  object-fit: cover;
+  border: 1px solid var(--et-border);
+  flex-shrink: 0;
+}
+
+.et-card-body {
+  min-width: 0;
+}
+
+.et-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.et-company {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0 0 4px;
+}
+
+.et-position {
+  font-size: 13px;
+  color: var(--et-accent);
+  margin: 0;
+  font-weight: 500;
+}
+
+.et-date {
+  font-size: 12px;
+  letter-spacing: 0.5px;
+  color: var(--et-text-dim);
+  white-space: nowrap;
+}
+
+.et-blurb {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--et-text-dim);
+  margin: 12px 0 16px;
+  max-width: 60ch;
+}
+
+.et-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--et-panel);
+  border: 1px solid var(--et-border);
+  color: var(--et-text);
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  padding: 9px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.et-more:hover {
+  background: var(--et-accent-soft);
+  border-color: rgba(224, 51, 63, 0.4);
+}
+
+/* ─── Modal ────────────────────────────────────────────── */
+.et-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(5, 5, 6, 0.75);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  z-index: 1000;
+}
+
+.et-modal {
+  position: relative;
+  width: 100%;
+  max-width: 560px;
+  max-height: 85vh;
+  overflow-y: auto;
+  background: var(--et-panel);
+  border: 1px solid var(--et-border);
+  border-radius: 20px;
+  padding: 36px;
+}
+
+.et-modal-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid var(--et-border);
+  background: transparent;
+  color: var(--et-text-dim);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.et-modal-close:hover {
+  background: var(--et-accent-soft);
+  color: var(--et-text);
+}
+
+.et-modal-top {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding-right: 30px;
+}
+
+.et-modal-top img {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  object-fit: cover;
+  border: 1px solid var(--et-border);
+  flex-shrink: 0;
+}
+
+.et-modal-top h3 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0 0 4px;
+}
+
+.et-modal-company {
+  font-size: 13px;
+  color: var(--et-accent);
+  margin: 0 0 2px;
+  font-weight: 500;
+}
+
+.et-modal-date {
+  font-size: 12px;
+  color: var(--et-text-dim);
+  margin: 0;
+}
+
+.et-modal-divider {
+  height: 1px;
+  background: var(--et-border);
+  margin: 22px 0;
+  transform-origin: left;
+}
+
+.et-modal-desc {
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--et-text-dim);
+  margin: 0 0 24px;
+}
+
+.et-modal-project {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--et-border);
+  border-radius: 14px;
+  padding: 18px 20px;
+  margin-bottom: 24px;
+}
+
+.et-modal-label {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--et-text-dim);
+  margin: 0 0 10px;
+}
+
+.et-modal-project-name {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  margin: 0 0 6px;
+}
+
+.et-modal-project-detail {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--et-text-dim);
+  margin: 0;
+}
+
+.et-modal-achievements {
+  list-style: none;
+  margin: 0 0 24px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.et-modal-achievements li {
+  position: relative;
+  padding-left: 20px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--et-text-dim);
+}
+
+.et-modal-achievements li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 6px;
+  width: 7px;
+  height: 7px;
+  border-radius: 2px;
+  background: var(--et-accent);
+}
+
+.et-modal-tech {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.et-modal-tech span {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--et-border);
+  color: var(--et-text-dim);
+}
+
+/* ─── Responsive ───────────────────────────────────────── */
+@media (max-width: 900px) {
+  .et-container {
+    padding: 0 24px;
+  }
+}
+
+/* Tablet: card padding tightens a bit before the mobile
+   single-column marker/logo/body layout kicks in at 640px. */
+@media (max-width: 768px) {
+  .et-card {
+    padding: 24px 20px;
+    gap: 16px;
+  }
+}
+
+@media (max-width: 640px) {
+  .et-root {
+    padding: 64px 0;
+  }
+
+  .et-container {
+    padding: 0 20px;
+  }
+
+  .et-glow--1,
+  .et-glow--2 {
+    width: 320px;
+    height: 320px;
+  }
+
+  .et-card {
+    grid-template-columns: auto 1fr;
+    gap: 14px;
+  }
+
+  .et-marker {
+    grid-column: 1;
+    grid-row: 1 / 3;
+  }
+
+  .et-logo {
+    grid-column: 2;
+    grid-row: 1;
+    width: 42px;
+    height: 42px;
+  }
+
+  .et-card-body {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  .et-date {
+    white-space: normal;
+  }
+
+  .et-modal {
+    padding: 26px;
+  }
+
+  .et-modal-top {
+    padding-right: 20px;
+  }
+}
+
+@media (max-width: 380px) {
+  .et-card {
+    padding: 18px 16px;
+  }
+
+  .et-headline {
+    letter-spacing: -0.5px;
+  }
+}
+
+/* ─── Reduced motion ───────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .et-more {
+    transition: none;
+  }
+
+  .cell p {
+    animation: none;
+    opacity: 0.15;
+  }
+}

@@ -1,261 +1,469 @@
-import { useEffect, useRef, useState, useMemo } from "react";
-import { FiExternalLink } from "react-icons/fi";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import "./ExperienceSection.css";
-import img from "../../assets/demo.jpg";
-import carImg from "../../assets/mydemo.png";
+import { FiX, FiArrowUpRight } from "react-icons/fi";
+import "./ExperienceTimeline.css";
+import logo from "../../assets/demo.jpg"; // swap per-company below if you have individual logos
 
 gsap.registerPlugin(ScrollTrigger);
 
-/* ─── Data ───────────────────────────────────────────────── */
-/* Trimmed: description + achievements removed, tech list capped at 3
-   since the card now shows everything at once with no expand step. */
+/* ─── Dummy data — replace with your real roles ───────── */
 const EXPERIENCES = [
   {
     id: 1,
-    logo: img,
-    company: "NeuSpaarX Technologies Pvt. Ltd.",
-    date: "Feb 2026 – Present",
-    title: "Full-Stack Engineer",
-    tech: ["React", "Node.js", "Kubernetes"],
+    logo,
+    company: "Nimbus Cloudworks",
+    position: "Software Engineer Intern",
+    date: "Jun 2024 – Aug 2024",
+    blurb: "Worked on the internal admin dashboard used across three product teams.",
+    description:
+      "Joined the platform team to help rebuild the internal admin dashboard, focusing on data-heavy views and permission-aware routing for a growing user base.",
+    project: {
+      name: "Internal Admin Dashboard",
+      detail:
+        "Rebuilt the legacy dashboard in React with server-driven tables, role-based views, and audit-log export — replacing a jQuery UI that hadn't been touched in years.",
+    },
+    achievements: [
+      "Cut initial page load time by 45% via code-splitting and lazy-loaded routes.",
+      "Built a reusable table component now used across 6 internal tools.",
+      "Wrote the onboarding guide new interns still use today.",
+    ],
+    tech: ["React", "Node.js", "PostgreSQL", "Docker"],
   },
   {
     id: 2,
-    logo: img,
-    company: "ERC",
-    date: "Sep 2025 – Present",
-    title: "Frontend Developer",
-    tech: ["React", "Redux", "Tailwind CSS"],
+    logo,
+    company: "Quantify Analytics",
+    position: "Frontend Developer",
+    date: "Jan 2025 – Jun 2025",
+    blurb: "Built customer-facing data visualization tools for a fintech analytics product.",
+    description:
+      "Owned the frontend for a client-facing analytics suite, translating raw financial data into dashboards non-technical stakeholders could actually use.",
+    project: {
+      name: "Portfolio Insights Dashboard",
+      detail:
+        "Designed and built an interactive charting suite (D3 + Recharts) letting clients drill from portfolio-level summaries down to individual trade history.",
+    },
+    achievements: [
+      "Shipped a redesigned dashboard that raised weekly active usage by 30%.",
+      "Introduced component-level unit tests, catching regressions before release.",
+      "Partnered directly with design to build a shared component library.",
+    ],
+    tech: ["React", "TypeScript", "D3.js", "Tailwind CSS"],
   },
   {
     id: 3,
-    logo: img,
-    company: "Webstack Academy",
-    date: "Dec 2025 – Jan 2026",
-    title: "Full Stack Web Development in MERN",
-    tech: ["React", "Python", "D3.js"],
+    logo,
+    company: "PixelForge Studio",
+    position: "Full-Stack Developer (Freelance)",
+    date: "Jul 2025 – Present",
+    blurb: "Building e-commerce storefronts and booking systems for small business clients.",
+    description:
+      "Freelance full-stack work for small businesses — mostly e-commerce storefronts and booking flows that need to ship fast without cutting corners on quality.",
+    project: {
+      name: "Storefront + Booking Platform",
+      detail:
+        "Built a headless storefront with a custom booking calendar, payment integration, and an admin panel clients use to manage inventory themselves.",
+    },
+    achievements: [
+      "Delivered 4 client projects on time, each within a 6-week turnaround.",
+      "Integrated Razorpay/Stripe payments with proper webhook handling.",
+      "Set up CI/CD so clients get automatic previews on every change.",
+    ],
+    tech: ["React", "Express", "MongoDB", "Stripe"],
   },
 ];
 
-/* ─── Road geometry helpers ──────────────────────────────── */
-// Viewbox units — arbitrary, everything is expressed as % of these so the
-// whole thing is naturally responsive (SVG + markers share the same math).
-// The road is a straight vertical line pinned to the center of the
-// viewBox; stops alternate left/right of it.
-const VB_W = 100;
-const ROAD_X = 50; // dead center
-const STEP_Y = 85;
-const START_Y = 40;
-const END_PAD = 45;
+/* ─── Responsive background grid ─────────────────────────
+   Generates just enough cells to exactly fill its container
+   (measured live via ResizeObserver) instead of a fixed
+   50x50 block. This removes both the overflow risk on small
+   screens and the perf cost of thousands of unused cells. */
+const CELL_SIZE = 32; // px
+const MAX_CELLS = 600; // perf ceiling regardless of container size
 
-function buildWaypoints(count, roadX) {
-  const pts = [{ x: roadX, y: 0 }];
-  for (let i = 0; i < count; i++) {
-    pts.push({ x: roadX, y: START_Y + i * STEP_Y });
-  }
-  pts.push({ x: roadX, y: START_Y + (count - 1) * STEP_Y + END_PAD });
-  return pts;
-}
-
-// Straight vertical line through the waypoints.
-function buildPathD(points) {
-  let d = `M ${points[0].x} ${points[0].y}`;
-  for (let i = 1; i < points.length; i++) {
-    const prev = points[i - 1];
-    const curr = points[i];
-    const midY = (prev.y + curr.y) / 2;
-    d += ` C ${prev.x} ${midY}, ${curr.x} ${midY}, ${curr.x} ${curr.y}`;
-  }
-  return d;
-}
-
-// Length (in path units) from the start up to and including points[0..idx]
-function partialLength(points, idx) {
-  const sub = points.slice(0, idx + 1);
-  if (sub.length < 2) return 0;
-  const tmp = document.createElementNS("http://www.w3.org/2000/svg", "path");
-  tmp.setAttribute("d", buildPathD(sub));
-  return tmp.getTotalLength();
-}
-
-export default function ExperienceSection() {
-  const sectionRef = useRef(null);
-  const pathRef = useRef(null);
-  const carRef = useRef(null);
-  const [activeIndex, setActiveIndex] = useState(-1);
-
-  const waypoints = useMemo(() => buildWaypoints(EXPERIENCES.length, ROAD_X), []);
-  const pathD = useMemo(() => buildPathD(waypoints), [waypoints]);
-  const vbHeight = waypoints[waypoints.length - 1].y;
-
-  // stop coordinates are just the waypoints that correspond to a company
-  // (index 0 is the lead-in point, last is the lead-out point)
-  const stops = waypoints.slice(1, waypoints.length - 1);
+function useResponsiveGrid() {
+  const containerRef = useRef(null);
+  const [dims, setDims] = useState({ cols: 0, rows: 0 });
 
   useEffect(() => {
-    const path = pathRef.current;
-    const car = carRef.current;
-    if (!path || !car) return;
+    const el = containerRef.current;
+    if (!el) return;
 
-    const totalLength = path.getTotalLength();
-    const stopFractions = stops.map((_, i) => partialLength(waypoints, i + 1) / totalLength);
+    const compute = () => {
+      const { width, height } = el.getBoundingClientRect();
+      const cols = Math.max(1, Math.ceil(width / CELL_SIZE));
+      let rows = Math.max(1, Math.ceil(height / CELL_SIZE));
+      while (cols * rows > MAX_CELLS && rows > 1) rows -= 1;
+      setDims({ cols, rows });
+    };
 
-    // draw-on-scroll road tint
-    path.style.strokeDasharray = `${totalLength}`;
+    compute();
+    const ro = new ResizeObserver(compute);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  return { containerRef, ...dims };
+}
+
+export default function ExperienceTimeline() {
+  const rootRef = useRef(null);
+  const headerRef = useRef(null);
+  const glow1WrapRef = useRef(null);
+  const glow1Ref = useRef(null);
+  const glow2WrapRef = useRef(null);
+  const glow2Ref = useRef(null);
+  const backdropRef = useRef(null);
+  const modalRef = useRef(null);
+  const modalLogoRef = useRef(null);
+  const [activeExp, setActiveExp] = useState(null);
+  const { containerRef: gridRef, cols, rows } = useResponsiveGrid();
+
+  /* Background: idle floating drift + scroll parallax on the glow blobs */
+  useEffect(() => {
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+    if (prefersReducedMotion) return;
 
     const ctx = gsap.context(() => {
-      // Entrance
-      gsap.from(".exr-eyebrow", { opacity: 0, x: -24, duration: 0.5, ease: "power2.out" });
-      gsap.from(".exr-word", {
-        opacity: 0,
-        y: 32,
-        duration: 0.6,
-        stagger: 0.12,
-        ease: "power3.out",
-        delay: 0.1,
+      gsap.to(glow1Ref.current, {
+        x: 50,
+        y: -30,
+        duration: 9,
+        repeat: -1,
+        yoyo: true,
+        ease: "sine.inOut",
       });
-      gsap.from(".exr-view-all", { opacity: 0, x: 16, duration: 0.5, ease: "power2.out", delay: 0.3 });
+      gsap.to(glow2Ref.current, {
+        x: -60,
+        y: 40,
+        duration: 11,
+        repeat: -1,
+        yoyo: true,
+        ease: "sine.inOut",
+      });
 
-      // Scroll-driven journey
-      ScrollTrigger.create({
-        trigger: sectionRef.current,
-        start: "top top+=80",
-        end: "bottom bottom",
-        scrub: 0.6,
-        onUpdate: (self) => {
-          const progress = self.progress;
-          const len = progress * totalLength;
-          const pt = path.getPointAtLength(len);
-          const ahead = path.getPointAtLength(Math.min(len + 1, totalLength));
-          const behind = path.getPointAtLength(Math.max(len - 1, 0));
-          const angle = Math.atan2(ahead.y - behind.y, ahead.x - behind.x) * (180 / Math.PI);
-
-          const leftPct = (pt.x / VB_W) * 100;
-          const topPct = (pt.y / vbHeight) * 100;
-
-          car.style.left = `${leftPct}%`;
-          car.style.top = `${topPct}%`;
-          // Assumes carImg's default artwork faces "up" (nose at top).
-          // If your image faces a different way, tweak the +90 offset below.
-          car.style.transform = `translate(-50%, -50%) rotate(${angle + 90}deg)`;
-
-          path.style.strokeDashoffset = `${totalLength * (1 - progress)}`;
-
-          let reached = -1;
-          for (let i = 0; i < stopFractions.length; i++) {
-            if (progress >= stopFractions[i] - 0.015) reached = i;
-          }
-          setActiveIndex((prev) => (prev === reached ? prev : reached));
+      gsap.to(glow1WrapRef.current, {
+        y: 160,
+        ease: "none",
+        scrollTrigger: {
+          trigger: rootRef.current,
+          start: "top bottom",
+          end: "bottom top",
+          scrub: 0.6,
         },
       });
+      gsap.to(glow2WrapRef.current, {
+        y: -120,
+        ease: "none",
+        scrollTrigger: {
+          trigger: rootRef.current,
+          start: "top bottom",
+          end: "bottom top",
+          scrub: 0.6,
+        },
+      });
+      gsap.to(headerRef.current, {
+        y: -50,
+        ease: "none",
+        scrollTrigger: {
+          trigger: rootRef.current,
+          start: "top top",
+          end: "bottom top",
+          scrub: 0.6,
+        },
+      });
+    }, rootRef);
 
-      gsap.utils.toArray(".exr-stop").forEach((el, i) => {
-        gsap.from(el, {
-          opacity: 0,
-          x: i % 2 === 0 ? 40 : -40, // enters from its own side (right stops from right, left from left)
-          duration: 0.7,
+    return () => ctx.revert();
+  }, []);
+
+  /* Sequential scroll reveal — each card animates in as it's scrolled to */
+  useLayoutEffect(() => {
+    const ctx = gsap.context(() => {
+      gsap.from(".et-eyebrow", {
+        opacity: 0,
+        x: -24,
+        duration: 0.5,
+        ease: "power2.out",
+        scrollTrigger: { trigger: rootRef.current, start: "top 80%" },
+      });
+      gsap.from(".et-headline", {
+        opacity: 0,
+        y: 28,
+        duration: 0.6,
+        ease: "power3.out",
+        scrollTrigger: { trigger: rootRef.current, start: "top 80%" },
+      });
+
+      const cards = gsap.utils.toArray(".et-card");
+      cards.forEach((card, i) => {
+        const fromLeft = i % 2 === 0;
+
+        // Uses x / autoAlpha (transforms) instead of the `left` property —
+        // `left` only affects layout when the element is positioned, and
+        // combined with a content-sized card it was liable to push the
+        // section wider than the viewport on small screens.
+        gsap.fromTo(
+          card,
+          {
+            autoAlpha: 0,
+            x: fromLeft ? -48 : 48,
+            scale: 0.94,
+          },
+          {
+            autoAlpha: 1,
+            x: 0,
+            scale: 1,
+            duration: 0.7,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: card,
+              start: "top 85%",
+              toggleActions: "play none none reverse",
+            },
+          }
+        );
+
+        gsap.from(card.querySelector(".et-dot"), {
+          scale: 0,
+          duration: 0.4,
+          ease: "back.out(2.2)",
+          scrollTrigger: {
+            trigger: card,
+            start: "top 85%",
+            toggleActions: "play none none reverse",
+          },
+        });
+        gsap.from(card.querySelector(".et-line"), {
+          scaleY: 0,
+          transformOrigin: "top",
+          duration: 0.5,
           ease: "power2.out",
           scrollTrigger: {
-            trigger: el,
-            start: "top 80%",
+            trigger: card,
+            start: "top 85%",
+            toggleActions: "play none none reverse",
+          },
+        });
+        gsap.from(card.querySelector(".et-logo"), {
+          scale: 0.5,
+          rotate: -12,
+          opacity: 0,
+          duration: 0.5,
+          ease: "back.out(1.8)",
+          delay: 0.1,
+          scrollTrigger: {
+            trigger: card,
+            start: "top 85%",
             toggleActions: "play none none reverse",
           },
         });
       });
-    }, sectionRef);
+    }, rootRef);
 
     return () => ctx.revert();
-  }, [stops, waypoints, vbHeight]);
+  }, []);
+
+  /* Modal arrival animation */
+  useEffect(() => {
+    if (!activeExp || !backdropRef.current || !modalRef.current) return;
+
+    const tl = gsap.timeline();
+    tl.fromTo(backdropRef.current, { opacity: 0 }, { opacity: 1, duration: 0.3, ease: "power2.out" })
+      .fromTo(
+        modalRef.current,
+        { opacity: 0, y: 70, scale: 0.88, rotate: -2 },
+        { opacity: 1, y: 0, scale: 1, rotate: 0, duration: 0.55, ease: "back.out(1.7)" },
+        "-=0.15"
+      )
+      .fromTo(
+        modalLogoRef.current,
+        { scale: 0, rotate: -30, opacity: 0 },
+        { scale: 1, rotate: 0, opacity: 1, duration: 0.45, ease: "back.out(2.4)" },
+        "-=0.3"
+      )
+      .fromTo(
+        ".et-modal-top h3, .et-modal-company, .et-modal-date",
+        { opacity: 0, x: -16 },
+        { opacity: 1, x: 0, duration: 0.35, stagger: 0.06, ease: "power2.out" },
+        "-=0.3"
+      )
+      .fromTo(".et-modal-divider", { scaleX: 0 }, { scaleX: 1, duration: 0.4, ease: "power2.out" }, "-=0.2")
+      .fromTo(".et-modal-desc, .et-modal-project", { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.35, ease: "power2.out", stagger: 0.08 }, "-=0.15")
+      .fromTo(
+        ".et-modal-achievements li",
+        { opacity: 0, x: -12 },
+        { opacity: 1, x: 0, duration: 0.35, stagger: 0.07, ease: "power2.out" },
+        "-=0.1"
+      )
+      .fromTo(
+        ".et-modal-tech span",
+        { opacity: 0, scale: 0.8 },
+        { opacity: 1, scale: 1, duration: 0.3, stagger: 0.05, ease: "back.out(1.7)" },
+        "-=0.15"
+      );
+
+    const onKey = (e) => e.key === "Escape" && closeModal();
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeExp]);
+
+  const closeModal = () => {
+    if (!backdropRef.current || !modalRef.current) {
+      setActiveExp(null);
+      return;
+    }
+    gsap.to(modalRef.current, { opacity: 0, y: 30, scale: 0.92, duration: 0.28, ease: "power2.in" });
+    gsap.to(backdropRef.current, {
+      opacity: 0,
+      duration: 0.28,
+      ease: "power2.in",
+      onComplete: () => setActiveExp(null),
+    });
+  };
+
+  // Event-driven only — cheap, since it runs once per hover rather than
+  // as a perpetual loop across every cell.
+  const handleHover = (e) => {
+    const cell = e.currentTarget;
+    gsap.killTweensOf(cell);
+    gsap.fromTo(
+      cell,
+      {
+        backgroundColor: "#ff3b3b",
+        boxShadow: "0 0 20px #ff0000",
+      },
+      {
+        backgroundColor: "transparent",
+        boxShadow: "0 0 0px transparent",
+        duration: 0.8,
+        ease: "power2.out",
+      }
+    );
+  };
+
+  const cellCount = cols * rows;
+  const cells = Array.from({ length: cellCount });
 
   return (
-    <section
-      id="experience"
-      className="exr-root"
-      ref={sectionRef}
-      style={{ height: `${EXPERIENCES.length * 95}vh` }}
-    >
-      {/* Header */}
-      <div className="exr-header">
-        <p className="exr-eyebrow">The Road So Far</p>
-        <div className="exr-header-row">
-          <h2 className="exr-headline">
-            <span className="exr-word">Professional</span>{" "}
-            <span className="exr-word exr-word--accent">Experience.</span>
-          </h2>
-          <a href="https://linkedin.com" target="_blank" rel="noreferrer" className="exr-view-all">
-            <FiExternalLink size={16} />
-            View Full Resume
-            <svg className="exr-view-all-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path
-                d="M3 13L13 3M13 3H6M13 3V10"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </a>
+    <section className="et-root" ref={rootRef}>
+      {/* Animated background */}
+      <div className="et-bg" aria-hidden="true">
+        <div
+          className="grid"
+          ref={gridRef}
+          style={{
+            gridTemplateColumns: `repeat(${cols || 1}, 1fr)`,
+            gridTemplateRows: `repeat(${rows || 1}, 1fr)`,
+          }}
+        >
+          {cells.map((_, i) => (
+            <div
+              className="cell"
+              key={i}
+              onMouseEnter={handleHover}
+              style={{
+                "--cell-duration": `${(3 + Math.random() * 7).toFixed(2)}s`,
+                "--cell-delay": `${(Math.random() * 3).toFixed(2)}s`,
+              }}
+            >
+              <p>{i % 2 === 0 ? "0" : "1"}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className="et-glow-wrap et-glow-wrap--1" ref={glow1WrapRef}>
+          <div className="et-glow et-glow--1" ref={glow1Ref} />
+        </div>
+        <div className="et-glow-wrap et-glow-wrap--2" ref={glow2WrapRef}>
+          <div className="et-glow et-glow--2" ref={glow2Ref} />
         </div>
       </div>
 
-      {/* Road + stops */}
-      <div className="exr-road-wrap">
-        <svg
-          className="exr-road-svg"
-          viewBox={`0 0 ${VB_W} ${vbHeight}`}
-          preserveAspectRatio="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          {/* base (unfinished) road */}
-          <path d={pathD} className="exr-road-base" fill="none" />
-          {/* traveled road, revealed as you scroll */}
-          <path ref={pathRef} d={pathD} className="exr-road-progress" fill="none" />
-          {/* lane markings */}
-          <path d={pathD} className="exr-road-lane-base" fill="none" />
-        </svg>
-
-        {/* Vehicle */}
-        <div className="exr-car" ref={carRef} aria-hidden="true">
-          <img src={carImg} alt="" className="exr-car-img" />
+      <div className="et-container">
+        <div className="et-header" ref={headerRef}>
+          <p className="et-eyebrow">Where I've worked</p>
+          <h2 className="et-headline">
+            Experience <span>Timeline.</span>
+          </h2>
         </div>
 
-        {/* Stop markers + info cards — alternate left/right of the
-            centered road. Content is fully visible at all times. */}
-        {stops.map((pt, i) => {
-          const exp = EXPERIENCES[i];
-          const isReached = i <= activeIndex;
-          const side = i % 2 === 0 ? "right" : "left";
-          return (
-            <div
-              key={exp.id}
-              className={`exr-stop exr-stop--${side} ${isReached ? "exr-stop--reached" : ""}`}
-              style={{ top: `${(pt.y / vbHeight) * 100}%` }}
-            >
-              <span className="exr-pin" aria-hidden="true">
-                <span className="exr-pin-index">0{i + 1}</span>
-                <span className="exr-pin-dot" />
-              </span>
+        <div className="et-list">
+          {EXPERIENCES.map((exp, i) => (
+            <div className="et-card" key={exp.id}>
+              <div className="et-marker">
+                <div className="et-dot" />
+                {i < EXPERIENCES.length - 1 && <div className="et-line" />}
+              </div>
 
-              <div className="exr-card">
-                <div className="exr-card-top">
-                  <img className="exr-card-logo" src={exp.logo} alt="" />
+              <img className="et-logo" src={exp.logo} alt={exp.company} loading="lazy" />
+
+              <div className="et-card-body">
+                <div className="et-card-top">
                   <div>
-                    <h3 className="exr-card-title">{exp.title}</h3>
-                    <p className="exr-card-company">{exp.company}</p>
-                    <p className="exr-card-date">{exp.date}</p>
+                    <h3 className="et-company">{exp.company}</h3>
+                    <p className="et-position">{exp.position}</p>
                   </div>
+                  <span className="et-date">{exp.date}</span>
                 </div>
-                <div className="exr-card-tech">
-                  {exp.tech.map((t, j) => (
-                    <span key={j}>{t}</span>
-                  ))}
-                </div>
+
+                <p className="et-blurb">{exp.blurb}</p>
+
+                <button className="et-more" onClick={() => setActiveExp(exp)}>
+                  More info
+                  <FiArrowUpRight size={15} />
+                </button>
               </div>
             </div>
-          );
-        })}
+          ))}
+        </div>
       </div>
+
+      {activeExp && (
+        <div className="et-modal-backdrop" ref={backdropRef} onClick={closeModal}>
+          <div className="et-modal" ref={modalRef} onClick={(e) => e.stopPropagation()}>
+            <button className="et-modal-close" onClick={closeModal} aria-label="Close">
+              <FiX size={18} />
+            </button>
+
+            <div className="et-modal-top">
+              <img ref={modalLogoRef} src={activeExp.logo} alt={activeExp.company} />
+              <div>
+                <h3>{activeExp.position}</h3>
+                <p className="et-modal-company">{activeExp.company}</p>
+                <p className="et-modal-date">{activeExp.date}</p>
+              </div>
+            </div>
+
+            <div className="et-modal-divider" />
+
+            <p className="et-modal-desc">{activeExp.description}</p>
+
+            <div className="et-modal-project">
+              <p className="et-modal-label">What I built</p>
+              <p className="et-modal-project-name">{activeExp.project.name}</p>
+              <p className="et-modal-project-detail">{activeExp.project.detail}</p>
+            </div>
+
+            <p className="et-modal-label">Highlights</p>
+            <ul className="et-modal-achievements">
+              {activeExp.achievements.map((a, i) => (
+                <li key={i}>{a}</li>
+              ))}
+            </ul>
+
+            <div className="et-modal-tech">
+              {activeExp.tech.map((t) => (
+                <span key={t}>{t}</span>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

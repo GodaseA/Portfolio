@@ -15,7 +15,7 @@ import ScrollSequence from "./components/Hero/ScrollSequence";
 const App = () => {
   return (
     <div>
-      <GlobeBackground />
+      {/* <GlobeBackground /> */}
       <Navbar />
       <ScrollSequence />
       <About />
@@ -23,7 +23,8 @@ const App = () => {
       {/* <Home/> */}
       {/* <HangingIdCard/> */}
       <ExperienceSection />
-
+{/* <Contact/> */}
+<Footer/>
 
     </div>
   )
