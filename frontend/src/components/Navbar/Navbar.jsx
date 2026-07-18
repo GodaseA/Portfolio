@@ -83,10 +83,14 @@ const Navbar = () => {
         delay: 0.15,
         ease: "power2.out",
       });
-      gsap.from(".nv-social-btn", {
+      gsap.fromTo(".nv-social-btn", {
         opacity: 0,
         y: -12,
-        duration: 0.4,
+      
+      },{
+          opacity: 1,
+        y: 0,
+          duration: 0.4,
         stagger: 0.06,
         delay: 0.35,
         ease: "power2.out",

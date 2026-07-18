@@ -105,7 +105,8 @@ const Footer = () => {
     <div id="footer" className="footer" ref={rootRef}>
       <div className="footer-top">
         <div className="footer-top-left">
-          <img className="footer-logo-mark" src={footer_logo} alt="Logo" />
+          {/* <img className="footer-logo-mark" src={footer_logo} alt="Logo" /> */}
+          <span className="footer-logo-mark">Abhijit<span className="footer-logo-mark-dot">.</span></span>
           <img className="ppp" src={assets.ProfilePic} alt="" />
           <p className="footer-bio">
             I am a Full Stack developer, I am in 3rd year pursuing Computer Engineering at GCOEARA

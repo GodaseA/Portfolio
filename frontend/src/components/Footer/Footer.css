@@ -40,9 +40,22 @@
 
 .footer-logo-mark {
   grid-column: 1 / -1;
-  height: 28px;
-  width: auto;
+   
   justify-self: start;
+
+
+
+    font-family: 'Space Grotesk', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.2px;
+}
+
+.footer-logo-mark-dot {
+  
+  color: #e0333f;
+   
 }
 
 .ppp {
