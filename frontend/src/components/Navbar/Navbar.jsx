@@ -5,9 +5,17 @@ import { FiGithub, FiLinkedin, FiFileText, FiMenu, FiX } from "react-icons/fi";
 import { assets } from "../../assets/assets";
 import "./Navbar.css";
 
+
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+gsap.registerPlugin(ScrollTrigger);
+
+
+
+
 const NAV_LINKS = [
   { id: "about", label: "About" },
-  { id: "project", label: "Projects" },
+  { id: "projects", label: "Projects" },
   { id: "experince", label: "Experience" },
 ];
 
@@ -15,21 +23,21 @@ const SOCIAL_LINKS = [
   {
     id: "linkedin",
     label: "LinkedIn",
-    href: "https://linkedin.com/in/your-profile",
+    href: "https://linkedin.com/in/abhijitgodase",
     icon: FiLinkedin,
     external: true,
   },
   {
     id: "github",
     label: "GitHub",
-    href: "https://github.com/your-username",
+    href: "https://github.com/GodaseA",
     icon: FiGithub,
     external: true,
   },
   {
     id: "resume",
     label: "Download CV",
-    href: "/resume.pdf",
+    href: "/Abhijit_Godase_Resume.pdf",
     icon: FiFileText,
     download: true,
   },
@@ -46,6 +54,29 @@ const Navbar = () => {
   const drawerRef = useRef(null);
   const overlayRef = useRef(null);
   const hamburgerRef = useRef(null);
+
+
+
+  useEffect(() => {
+  const triggers = NAV_LINKS.map(({ id }) => {
+    const section = document.getElementById(id);
+
+    if (!section) return null;
+
+    return ScrollTrigger.create({
+      trigger: section,
+      start: "top center",
+      end: "bottom center",
+
+      onEnter: () => setActive(id),
+      onEnterBack: () => setActive(id),
+    });
+  });
+
+  return () => {
+    triggers.forEach((t) => t && t.kill());
+  };
+}, []);
 
   /* Frosted glass effect on scroll */
   useEffect(() => {
@@ -156,7 +187,7 @@ const Navbar = () => {
     <>
       <nav className={`nv-root ${scrolled ? "nv-root--scrolled" : ""}`} ref={navRef}>
         {/* Logo / Name */}
-        <AnchorLink href="#home" className="nv-logo" onClick={() => handleNav("home")}>
+        <AnchorLink href="#hero" className="nv-logo" onClick={() => handleNav("home")}>
           <img src={assets.ProfilePic} alt="Abhijit Godase" className="nv-avatar" />
           <span className="nv-brand">
             Abhijit<span className="nv-brand-dot">.</span>

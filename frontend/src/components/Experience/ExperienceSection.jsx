@@ -350,7 +350,7 @@ export default function ExperienceTimeline() {
   const cells = Array.from({ length: cellCount });
 
   return (
-    <section className="et-root" ref={rootRef}>
+    <section className="et-root" id="experince" ref={rootRef}>
       {/* Animated background */}
       <div className="et-bg" aria-hidden="true">
         <div

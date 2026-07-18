@@ -228,7 +228,7 @@ requestAnimationFrame(() => ScrollTrigger.refresh());
   const progressPct = total ? Math.round((loadedCount / total) * 100) : 0;
 
   return (
-    <section ref={sectionRef} className="sequence">
+    <section ref={sectionRef} className="sequence" id="hero">
       {!isReady && (
         <div className="sequence-loader" role="status" aria-live="polite">
           <div className="sequence-loader-bar">

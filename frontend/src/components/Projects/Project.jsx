@@ -230,7 +230,7 @@ export default function Project() {
   }, []);
 
   return (
-    <section className="project-section" ref={sectionRef}>
+    <section className="project-section" id="projects" ref={sectionRef}>
       <div className="project-wrapper">
         <header className="project-header">
           <div className="project-heading">
