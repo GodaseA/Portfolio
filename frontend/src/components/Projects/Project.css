@@ -106,12 +106,18 @@
 
 .project-title {
   font-family: var(--font-display);
-  font-weight: 700;
-  font-size: clamp(2.2rem, 5.5vw, 3.75rem);
-  line-height: 1.02;
+   line-height: 1.02;
   margin: 0;
-  letter-spacing: -0.01em;
+   font-size: clamp(52px, 7vw, 80px);
+  font-weight: 700;
+   letter-spacing: -2px;
+   color: #ffffff;
 }
+
+.project-title span{
+ color: var(--accent);
+}
+
 
 .project-rail {
   display: flex;

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { FaLinkedinIn, FaInstagram, FaGithub, FaWhatsapp, FaEnvelope } from "react-icons/fa";
+import { SiLeetcode } from "react-icons/si";
 import "./Footer.css";
 import footer_logo from "../../assets/footer_logo.svg";
 import user_icon from "../../assets/user_icon.svg";
@@ -12,10 +13,12 @@ gsap.registerPlugin(ScrollTrigger);
 // Replace these with your real profile URLs
 const SOCIALS = [
   { name: "LinkedIn", icon: FaLinkedinIn, url: "https://linkedin.com/in/abhijitgodase" },
-  { name: "Instagram", icon: FaInstagram, url: "https://instagram.com/abhijitgodase" },
-  { name: "GitHub", icon: FaGithub, url: "https://github.com/abhijitgodase" },
+  { name: "LeetCode", icon: SiLeetcode, url: "https://leetcode.com/u/GodaseA/" },
+  { name: "GitHub", icon: FaGithub, url: "https://github.com/GodaseA" },
   { name: "Mail", icon: FaEnvelope, url: "mailto:abhijitgodase04.10@gmail.com" },
-  { name: "WhatsApp", icon: FaWhatsapp, url: "https://wa.me/917489873816" },
+  { name: "WhatsApp", icon: FaWhatsapp, url: "https://wa.me/917498873816" },
+  { name: "Instagram", icon: FaInstagram, url: "https://instagram.com/abhijit_godase.2005" },
+
 ];
 
 const Footer = () => {

@@ -21,7 +21,7 @@
   position: relative;
   overflow: hidden;
   box-sizing: border-box;
-  cursor: none;
+  /* cursor: none; */
 }
 
 /* ─── Scrolling background words ──────────────────────── */
@@ -158,8 +158,10 @@
 }
 
 .ab-word--outline {
-  color: transparent;
-  -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.28);
+  /* color: transparent;
+  -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.28); */
+
+  color: var(--ab-accent);
 }
 
 /* ─── Two-column grid ─────────────────────────────────── */

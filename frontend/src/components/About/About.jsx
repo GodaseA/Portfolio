@@ -192,8 +192,7 @@ const About = () => {
         scrollTrigger: {
           trigger: ".ab-skill-container",
           start: "top 88%",
-          markers:true,
-          toggleActions: "play none none reverse",
+           toggleActions: "play none none reverse",
         },
       });
     }, rootRef);
@@ -336,8 +335,8 @@ const About = () => {
                   <line x1="40" y1="210" x2="220" y2="210" className="ab-card-divider" />
 
                   {/* detail rows */}
-                  <text x="40" y="234" className="ab-card-label">ID NO.</text>
-                  <text x="220" y="234" textAnchor="end" className="ab-card-value">FS · 2026</text>
+                  <text x="40" y="234" className="ab-card-label">Age</text>
+                  <text x="220" y="234" textAnchor="end" className="ab-card-value">21 YEARS</text>
 
                   <text x="40" y="258" className="ab-card-label">STACK</text>
                   <text x="220" y="258" textAnchor="end" className="ab-card-value">MERN</text>

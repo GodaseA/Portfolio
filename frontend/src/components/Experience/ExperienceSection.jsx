@@ -4,73 +4,60 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { FiX, FiArrowUpRight } from "react-icons/fi";
 import "./ExperienceTimeline.css";
 import logo from "../../assets/demo.jpg"; // swap per-company below if you have individual logos
-
+import erc from "../../assets/companyLogo/ERC.png"
+import NeuX from "../../assets/companyLogo/NeuX.png"
+import { FaLink } from "react-icons/fa";
 gsap.registerPlugin(ScrollTrigger);
 
 /* ─── Dummy data — replace with your real roles ───────── */
 const EXPERIENCES = [
   {
     id: 1,
-    logo,
-    company: "Nimbus Cloudworks",
-    position: "Software Engineer Intern",
-    date: "Jun 2024 – Aug 2024",
-    blurb: "Worked on the internal admin dashboard used across three product teams.",
+    logo: erc,
+    company: "Enlectic Research Center, GCOEARA ",
+    position: "Computer Engineering Club Member & Developer",
+    date: "Jun 2025 – Present",
+    blurb: "Developed and contributed to web applications using the MERN stack.",
     description:
-      "Joined the platform team to help rebuild the internal admin dashboard, focusing on data-heavy views and permission-aware routing for a growing user base.",
-    project: {
-      name: "Internal Admin Dashboard",
-      detail:
-        "Rebuilt the legacy dashboard in React with server-driven tables, role-based views, and audit-log export — replacing a jQuery UI that hadn't been touched in years.",
-    },
+      "Coordinated with team members to plan and execute technical events Reviewed code and helped junior members with React, Node.js, and Git , etc.",
+
     achievements: [
-      "Cut initial page load time by 45% via code-splitting and lazy-loaded routes.",
-      "Built a reusable table component now used across 6 internal tools.",
-      "Wrote the onboarding guide new interns still use today.",
+      "Collaborated with team members on technical and college projects.",
+      "Participated in coding events, workshops, and technical sessions.",
     ],
-    tech: ["React", "Node.js", "PostgreSQL", "Docker"],
+    tech: ["React", "Node.js", "Git", "Postman"],
+    link: "https://www.linkedin.com/company/enlectic-research-centre/"
   },
-  {
-    id: 2,
-    logo,
-    company: "Quantify Analytics",
-    position: "Frontend Developer",
-    date: "Jan 2025 – Jun 2025",
-    blurb: "Built customer-facing data visualization tools for a fintech analytics product.",
-    description:
-      "Owned the frontend for a client-facing analytics suite, translating raw financial data into dashboards non-technical stakeholders could actually use.",
-    project: {
-      name: "Portfolio Insights Dashboard",
-      detail:
-        "Designed and built an interactive charting suite (D3 + Recharts) letting clients drill from portfolio-level summaries down to individual trade history.",
-    },
-    achievements: [
-      "Shipped a redesigned dashboard that raised weekly active usage by 30%.",
-      "Introduced component-level unit tests, catching regressions before release.",
-      "Partnered directly with design to build a shared component library.",
-    ],
-    tech: ["React", "TypeScript", "D3.js", "Tailwind CSS"],
-  },
+
   {
     id: 3,
-    logo,
-    company: "PixelForge Studio",
-    position: "Full-Stack Developer (Freelance)",
-    date: "Jul 2025 – Present",
-    blurb: "Building e-commerce storefronts and booking systems for small business clients.",
+    logo: NeuX,
+    company: "NeuSpaarX Technologies Pvt. Ltd.",
+    position: "Full-Stack Developer Intern",
+    date: "Feb 2026 – Present",
+    blurb: "Developed and Deployed scalable full-stack web applications using the MERN stack.",
     description:
-      "Freelance full-stack work for small businesses — mostly e-commerce storefronts and booking flows that need to ship fast without cutting corners on quality.",
-    project: {
-      name: "Storefront + Booking Platform",
-      detail:
-        "Built a headless storefront with a custom booking calendar, payment integration, and an admin panel clients use to manage inventory themselves.",
-    },
-    achievements: [
-      "Delivered 4 client projects on time, each within a 6-week turnaround.",
-      "Integrated Razorpay/Stripe payments with proper webhook handling.",
-      "Set up CI/CD so clients get automatic previews on every change.",
+      "Built reusable React components and integrated REST APIs.",
+    project: [
+      {
+        name: "BAIREES Landing page",
+        detail:
+          "",
+        link: "https://bairees.com/"
+      },
+      {
+        name: "Devotee Management",
+        detail:
+          "",
+        link: "https://bairees.com/"
+      },
     ],
-    tech: ["React", "Express", "MongoDB", "Stripe"],
+    achievements: [
+      "Collaborated with cross-functional teams using Git and Agile practices.",
+      "Deployed and maintained backend services on AWS Elastic Beanstalk.",
+    ],
+    tech: ["React", "Express", "MongoDB", "AWS"],
+    link: "https://www.linkedin.com/company/neuspaarx/"
   },
 ];
 
@@ -399,13 +386,25 @@ export default function ExperienceTimeline() {
                 <div className="et-dot" />
                 {i < EXPERIENCES.length - 1 && <div className="et-line" />}
               </div>
+              <a href={exp.link}
+                target="_blank"
+                rel="noopener noreferrer">
+                <img className="et-logo" src={exp.logo} alt={exp.company} loading="lazy" />
 
-              <img className="et-logo" src={exp.logo} alt={exp.company} loading="lazy" />
+              </a>
 
               <div className="et-card-body">
                 <div className="et-card-top">
                   <div>
-                    <h3 className="et-company">{exp.company}</h3>
+
+
+                    <a href={exp.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ textDecoration: "none", color: "white" }}>
+                      <h3 className="et-company">{exp.company}</h3>
+
+                    </a>
                     <p className="et-position">{exp.position}</p>
                   </div>
                   <span className="et-date">{exp.date}</span>
@@ -431,7 +430,14 @@ export default function ExperienceTimeline() {
             </button>
 
             <div className="et-modal-top">
+
+ <a href={activeExp.link}
+                target="_blank"
+                rel="noopener noreferrer">
               <img ref={modalLogoRef} src={activeExp.logo} alt={activeExp.company} />
+
+              </a>
+
               <div>
                 <h3>{activeExp.position}</h3>
                 <p className="et-modal-company">{activeExp.company}</p>
@@ -445,8 +451,31 @@ export default function ExperienceTimeline() {
 
             <div className="et-modal-project">
               <p className="et-modal-label">What I built</p>
-              <p className="et-modal-project-name">{activeExp.project.name}</p>
-              <p className="et-modal-project-detail">{activeExp.project.detail}</p>
+
+              {   activeExp.project?
+                 
+              <>
+              <p className="et-modal-project-name">
+                <a href={activeExp.project[0].link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ textDecoration: "none", color: "white" }}>
+                  {activeExp.project[0].name}  <FaLink />  </a>
+              </p>
+              <p className="et-modal-project-name">
+                <a href={activeExp.project[1].link} target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ textDecoration: "none", color: "white" }}>
+                  {activeExp.project[1].name}  <FaLink />  </a>
+              </p></>
+              :<></>
+             }
+              
+
+
+
+
+
             </div>
 
             <p className="et-modal-label">Highlights</p>

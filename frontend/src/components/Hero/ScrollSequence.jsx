@@ -245,7 +245,7 @@ requestAnimationFrame(() => ScrollTrigger.refresh());
 
       <div className="sequence-overlay">
         <header className="sequence-topbar">
-          <span className="wordmark">ABHIJIT</span>
+          <span className="wordmark">...godase</span>
           <span className="frame-counter" ref={counterRef}>
             {`001 / ${FRAME_COUNT}`}
           </span>
@@ -281,7 +281,7 @@ requestAnimationFrame(() => ScrollTrigger.refresh());
                 <a href="#projects">
                   View Work <span aria-hidden="true">&rarr;</span>
                 </a>
-                <a href="#contact">
+                <a href="#footer">
                   Let's Talk <span aria-hidden="true">&rarr;</span>
                 </a>
               </div>

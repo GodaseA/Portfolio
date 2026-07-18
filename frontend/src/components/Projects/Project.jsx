@@ -22,9 +22,9 @@ const PROJECTS = [
     tag: "Full-Stack",
     description: "End-to-end food ordering platform.",
     image: foodDel,
-    github: "#",
-    live: "#",
-    technologies: ["React", "Node.js", "MongoDB", "Stripe"],
+    github: "https://github.com/GodaseA/Food-Delivery",
+    live: "https://github.com/GodaseA/Food-Delivery",
+    technologies: ["React", "Node.js", "MongoDB", "Razorpay"],
   },
   {
     id: 2,
@@ -32,9 +32,9 @@ const PROJECTS = [
     tag: "Frontend",
     description: "Animated personal portfolio",
     image: portfolio,
-    github: "#",
+    github: "https://github.com/GodaseA/Portfolio",
     live: "#",
-    technologies: ["React", "GSAP", "Three.js"],
+    technologies: ["React", "GSAP", "SVG"],
   },
   {
     id: 3,
@@ -42,9 +42,9 @@ const PROJECTS = [
     tag: "Full-Stack",
     description: "Real-time AQI Predictor.",
     image: aqi,
-    github: "#",
-    live: "#",
-    technologies: ["React", "Socket.io", "Express", "MongoDB"],
+    github: "https://github.com/GodaseA/AQI_predictor",
+    live: "https://main.d3f1ppquakakyb.amplifyapp.com/",
+    technologies: ["React", "API", "Express", "MongoDB"],
   },
   {
     id: 4,
@@ -52,9 +52,9 @@ const PROJECTS = [
     tag: "Full-Stack",
     description: "Product and inventory management.",
     image: eComerce,
-    github: "#",
-    live: "#",
-    technologies: ["React", "Redux", "Node.js", "PostgreSQL"],
+    github: "https://github.com/GodaseA/",
+    live: "https://github.com/GodaseA/",
+    technologies: ["React", "Redux", "Node.js", "MongoDDB"],
   },
   {
     id: 5,
@@ -62,19 +62,19 @@ const PROJECTS = [
     tag: "Frontend",
     description: "Get and Create corces.",
     image: lms,
-    github: "#",
-    live: "#",
-    technologies: ["React", "DnD Kit", "LocalStorage"],
+    github: "https://github.com/GodaseA/Learning-Management-System",
+    live: "https://github.com/GodaseA/Learning-Management-System",
+    technologies: ["React", "Node.js", "Express.js"],
   },
   {
     id: 6,
-    name: "Weather Dashboard",
-    tag: "API",
-    description: "7-day forecast dashboard .",
+    name: "More Project",
+    tag: "",
+    description: "",
     image: img,
-    github: "#",
-    live: "#",
-    technologies: ["React", "Axios", "Chart.js"],
+    github: "https://github.com/GodaseA/",
+    live: "https://github.com/GodaseA/",
+    technologies: ["React"],
   },
 ];
 
@@ -235,7 +235,7 @@ export default function Project() {
         <header className="project-header">
           <div className="project-heading">
             <span className="project-eyebrow">Project Index — 2026</span>
-            <h2 className="project-title">Selected Work</h2>
+            <h2 className="project-title">Selected  <span>Work</span></h2>
           </div>
 
           <div className="project-rail" aria-hidden="true">
